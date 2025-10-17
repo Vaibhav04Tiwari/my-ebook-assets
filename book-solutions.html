@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solutions Portal - Under the Banyan Tree</title>
+    <style>
+        /* CSS remains the same for styling consistency */
+        :root {
+            --color-primary: #86b097; 
+            --color-secondary: #a39baa; 
+            --color-background: #f8fbf8; 
+            --color-card-bg: #ffffff; 
+            --color-text-dark: #3a4750; 
+            --color-text-subtle: #79838b; 
+            --transition-speed-card: 0.6s; 
+            --transition-speed-button: 0.2s; 
+            
+            --shadow-light: 8px 8px 16px rgba(180, 190, 180, 0.4); 
+            --shadow-dark: -8px -8px 16px rgba(255, 255, 255, 1); 
+            
+            --color-read: #86b097; 
+            --color-back: #5f7481; 
+        }
+
+        /* --- General Styling --- */
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text-dark);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-image: linear-gradient(180deg, var(--color-background) 0%, #edf1ed 100%);
+        }
+
+        h1 {
+            color: var(--color-text-subtle); 
+            text-align: center;
+            padding: 25px 0; 
+            margin: 0;
+            font-size: 2em; 
+            width: 100%;
+            background: var(--color-card-bg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03); 
+            letter-spacing: 4px; 
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        #main-info {
+            position: relative;
+            display: flex;
+            width: 90%;
+            max-width: 1300px; 
+            margin: 100px auto; 
+            background-color: var(--color-card-bg); 
+            border-radius: 20px; 
+            overflow: hidden;
+            border: none; 
+            
+            box-shadow: 
+                6px 6px 12px rgba(180, 190, 180, 0.3), 
+                -6px -6px 12px rgba(255, 255, 255, 0.7); 
+            
+            transition: all var(--transition-speed-card) cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+        }
+
+        #main-info:hover {
+            transform: translateY(-8px) scale(1.005); 
+            box-shadow: 
+                12px 12px 24px rgba(180, 190, 180, 0.4), 
+                -12px -12px 24px rgba(255, 255, 255, 1);
+        }
+
+        #poster-area {
+            flex-shrink: 0;
+            width: 380px; 
+            height: 600px; 
+            background-color: #eef3ef; 
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 15px; 
+        }
+
+        #poster-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 10px; 
+            filter: grayscale(10%) contrast(105%); 
+            transition: filter var(--transition-speed-card) ease-out, 
+                        transform var(--transition-speed-card) ease-out;
+        }
+        
+        #main-info:hover #poster-area img {
+            transform: scale(1.015); 
+            filter: grayscale(0%) contrast(100%); 
+        }
+
+        #details-area {
+            padding: 60px 70px; 
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 20px; 
+            margin-top: 20px; 
+        }
+
+        #details-area h2 {
+            font-size: 3.8em; 
+            color: var(--color-primary);
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-weight: 800; 
+            line-height: 1.1;
+        }
+        
+        #details-area h2 span {
+            display: block;
+            font-size: 0.35em; 
+            color: var(--color-text-subtle);
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        #details-area p {
+            font-size: 1.15em; 
+            color: var(--color-text-dark);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .meta-data {
+            font-size: 1.4em; 
+            font-weight: 600;
+            color: var(--color-secondary);
+            margin-bottom: 40px;
+            border-left: 6px solid var(--color-secondary); 
+            padding-left: 20px;
+            line-height: 1.3;
+            text-transform: uppercase;
+        }
+
+        /* --- BUTTON STYLES (Same as before) --- */
+        .action-buttons button,
+        .action-buttons a { 
+            padding: 18px 50px; 
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 10px; 
+            font-size: 1.4em; 
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition-speed-button) ease-in-out;
+            display: inline-flex; 
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #read-button {
+            background-color: var(--color-read); 
+            color: white; 
+            box-shadow: 3px 3px 6px rgba(134, 176, 151, 0.6), 
+                        -3px -3px 6px rgba(255, 255, 255, 0.4); 
+        }
+
+        #read-button:hover {
+            background-color: #92c4a9; 
+            transform: translateY(-2px); 
+            box-shadow: 5px 5px 10px rgba(134, 176, 151, 0.8), 
+                        -5px -5px 10px rgba(255, 255, 255, 0.6);
+        }
+        
+        #read-button:active {
+            transform: scale(0.98); 
+            box-shadow: inset 4px 4px 8px rgba(134, 176, 151, 0.9), 
+                        inset -4px -4px 8px rgba(255, 255, 255, 0.3);
+        }
+        
+        #back-button { 
+            background-color: var(--color-back); 
+            color: white; 
+            box-shadow: 3px 3px 6px rgba(95, 116, 129, 0.6), 
+                        -3px -3px 6px rgba(255, 255, 255, 0.4); 
+        }
+        
+        #back-button:hover {
+            background-color: #718898; 
+            transform: translateY(-2px); 
+            box-shadow: 5px 5px 10px rgba(95, 116, 129, 0.8), 
+                        -5px -5px 10px rgba(255, 255, 255, 0.6);
+        }
+        
+        #back-button:active {
+            transform: scale(0.98); 
+            box-shadow: inset 4px 4px 8px rgba(95, 116, 129, 0.9), 
+                        inset -4px -4px 8px rgba(255, 255, 255, 0.3);
+        }
+        
+    </style>
+</head>
+<body>
+
+    <h1>ACADEMIC E-BOOK PORTAL // SOLUTION GUIDE</h1>
+
+    <div id="main-info">
+        <div id="poster-area"></div>
+        <div id="details-area">
+        </div>
+    </div>
+    
+    <script>
+        // =======================================================
+        //              OOP IMPLEMENTATION
+        // =======================================================
+
+        class Book {
+            constructor(title, subtitle, author, pages, coverImage, pdfPath, description) {
+                this.title = title;
+                this.subtitle = subtitle;
+                this.author = author;
+                this.pages = pages;
+                this.coverImage = coverImage;
+                this.pdfPath = pdfPath;
+                this.description = description;
+            }
+        }
+
+        class WebPage {
+            constructor(book) {
+                this.book = book;
+                this.buttonContainer = document.createElement('div');
+                this.buttonContainer.classList.add('action-buttons');
+            }
+
+            render() {
+                this.renderDetails();
+                document.getElementById('details-area').appendChild(this.buttonContainer);
+                
+                this.setupReadButton();
+                this.setupBackButton(); 
+            }
+
+            renderDetails() {
+                const posterArea = document.getElementById('poster-area');
+                const detailsArea = document.getElementById('details-area');
+
+                // 1. Poster
+                posterArea.innerHTML = `
+                    <img src="${this.book.coverImage}" alt="Cover of ${this.book.title}">
+                `;
+
+                // 2. Details (Title, Author, Pages, Description)
+                const detailsHTML = `
+                    <div>
+                        <h2>${this.book.title} <span>${this.book.subtitle}</span></h2>
+                        
+                        <div class="meta-data">
+                            Authored by: ${this.book.author}<br>
+                            Pages: ${this.book.pages}
+                        </div>
+                        <p>${this.book.description}</p>
+                    </div>
+                `;
+                detailsArea.innerHTML = detailsHTML; 
+            }
+
+            setupReadButton() {
+                const readButton = document.createElement('button');
+                readButton.id = 'read-button';
+                readButton.textContent = 'VIEW/DOWNLOAD SOLUTIONS E-BOOK'; // Updated text
+                
+                // CRITICAL CHANGE: We will use a direct link instead of a click handler 
+                // to open the PDF directly, allowing the browser to handle it.
+                
+                const readLink = document.createElement('a');
+                readLink.href = this.book.pdfPath;
+                readLink.target = '_blank'; // Opens in a new tab
+                readLink.style.textDecoration = 'none';
+
+                // Move the button styling/ID to the new element
+                readButton.id = 'read-button-old'; // Remove ID from button to avoid conflict
+                readLink.id = 'read-button'; // Put ID on the anchor tag for styling
+
+                readLink.appendChild(readButton);
+                
+                // Add the actual button text back to the button element
+                readButton.textContent = 'VIEW/DOWNLOAD SOLUTIONS E-BOOK';
+
+                this.buttonContainer.appendChild(readLink);
+            }
+            
+            // =======================================================
+            //                GO BACK BUTTON LOGIC
+            // =======================================================
+            setupBackButton() {
+                const backLink = document.createElement('a');
+                // Links back to the original index.html file
+                backLink.href = 'index.html'; 
+                backLink.style.textDecoration = 'none'; 
+                
+                const backButton = document.createElement('button');
+                backButton.id = 'back-button'; 
+                backButton.textContent = '← GO BACK TO MAIN E-BOOK';
+
+                backLink.appendChild(backButton);
+                this.buttonContainer.appendChild(backLink);
+            }
+            // =======================================================
+            
+            // NOTE: The original openProtectedReader is no longer needed 
+            // because we are using a direct <a> tag for the PDF link.
+        }
+
+        // =======================================================
+        //              APPLICATION SETUP (SOLUTIONS BOOK)
+        // =======================================================
+        
+        const mainBook = new Book(
+            "Solutions to Decoding Numbers", 
+            "Under the Banyan Tree", 
+            "Sumit Gupta", 
+            "320", 
+            "banyan_tree_cover.jpg", 
+            // 💡 CRITICAL: Use the file name as the path. 
+            // This only works if this PDF is in the same folder as this HTML file.
+            "ISI_Book_Number_Theory_Solutions (6).pdf", 
+            "This is the comprehensive solution guide for 'Decoding Numbers: An ISI Entrance Guide.' It provides detailed step-by-step solutions and explanations for all exercises in the main textbook, ensuring a complete and in-depth understanding of complex number theory concepts."
+        );
+
+        const app = new WebPage(mainBook);
+        app.render();
+
+    </script>
+</body>
+</html>
