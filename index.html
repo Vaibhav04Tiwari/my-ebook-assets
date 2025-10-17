@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic E-Book Portal - The Banyan Tree</title>
+    <style>
+        /* ======================================================= */
+        /* 🎨 NEW SOOTHING & EYE-CATCHING PALETTE (Sage & Lavender) */
+        /* ======================================================= */
+        :root {
+            --color-primary: #86b097; /* Soft Sage Green (Soothing Accent) */
+            --color-secondary: #a39baa; /* Muted Lavender/Gray (Subtle Contrast) */
+            --color-background: #f8fbf8; /* Ultra-Light Greenish-White Base */
+            --color-card-bg: #ffffff; /* Pure White Card Base */
+            --color-text-dark: #3a4750; /* Deep Charcoal/Slate */
+            --color-text-subtle: #79838b; /* Medium Cool Gray for meta */
+            --transition-speed-card: 0.6s; /* Slower, smoother lift */
+            --transition-speed-button: 0.2s; /* Crisp button feedback */
+
+            /* Neumorphic Shadow Variables */
+            --shadow-light: 8px 8px 16px rgba(180, 190, 180, 0.4); /* Soft, Light Shadow */
+            --shadow-dark: -8px -8px 16px rgba(255, 255, 255, 1); /* Intense, White Highlight */
+            
+            /* ⭐ NEW COLOR FOR SOLUTION BUTTON ⭐ */
+            --color-solution: #a39baa; /* Muted Lavender/Gray */
+        }
+
+        /* --- General Styling --- */
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text-dark);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Subtler background gradient for depth */
+            background-image: linear-gradient(180deg, var(--color-background) 0%, #edf1ed 100%);
+        }
+
+        h1 {
+            color: var(--color-text-subtle); 
+            text-align: center;
+            padding: 25px 0; /* Increased padding */
+            margin: 0;
+            font-size: 2em; /* Slightly larger */
+            width: 100%;
+            background: var(--color-card-bg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03); /* Lighter header shadow */
+            letter-spacing: 4px; /* More spaced out for calm */
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        /* ======================================================= */
+        /* 💡 MAIN CARD: NEUMORPHIC EFFECT */
+        /* ======================================================= */
+        #main-info {
+            position: relative;
+            display: flex;
+            width: 90%;
+            max-width: 1300px; /* Slightly wider */
+            margin: 100px auto; /* More vertical space */
+            background-color: var(--color-card-bg); 
+            border-radius: 20px; /* Softer, more rounded corners */
+            overflow: hidden;
+            border: none; /* Rely on shadows instead of hard borders */
+            
+            /* ⭐ Neumorphic Card Shadow (Soft, raised appearance) ⭐ */
+            box-shadow: 
+                6px 6px 12px rgba(180, 190, 180, 0.3), /* Darker, bottom-right shadow */
+                -6px -6px 12px rgba(255, 255, 255, 0.7); /* Lighter, top-left highlight */
+            
+            /* Enhanced transition */
+            transition: all var(--transition-speed-card) cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth Cubic transition */
+        }
+
+        /* ⭐ EYE-CATCHING CARD HOVER EFFECT: Deeper shadow and subtle rotation ⭐ */
+        #main-info:hover {
+            transform: translateY(-8px) scale(1.005); /* Gentle lift and small growth */
+            /* Deeper, more noticeable shadow effect */
+            box-shadow: 
+                12px 12px 24px rgba(180, 190, 180, 0.4), 
+                -12px -12px 24px rgba(255, 255, 255, 1);
+        }
+
+        /* --- Poster Area --- */
+        #poster-area {
+            flex-shrink: 0;
+            width: 380px; /* Wider poster area */
+            height: 600px; /* Taller */
+            background-color: #eef3ef; /* Background color slightly darker than body */
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 15px; /* Padding for the image */
+        }
+
+        #poster-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 10px; /* Match card radius */
+            /* Subtle, soothing filter */
+            filter: grayscale(10%) contrast(105%); 
+            transition: filter var(--transition-speed-card) ease-out, 
+                         transform var(--transition-speed-card) ease-out;
+        }
+        
+        /* Image subtle zoom and color pop on hover */
+        #main-info:hover #poster-area img {
+            transform: scale(1.015); 
+            filter: grayscale(0%) contrast(100%); /* Color pops out on hover */
+        }
+
+        /* --- Details Area --- */
+        #details-area {
+            padding: 60px 70px; /* Increased padding */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        /* ADDED: Container for the two buttons to sit next to each other */
+        .action-buttons {
+            display: flex;
+            gap: 20px; /* Space between buttons */
+            margin-top: 20px; /* Space from description */
+        }
+        /* END ADDED */
+
+        #details-area h2 {
+            font-size: 3.8em; /* Larger title */
+            color: var(--color-primary);
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-weight: 800; /* Bolder title */
+            line-height: 1.1;
+        }
+        
+        #details-area h2 span {
+            display: block;
+            font-size: 0.35em; /* Slightly smaller subtitle */
+            color: var(--color-text-subtle);
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        #details-area p {
+            font-size: 1.15em; /* Slightly larger text */
+            color: var(--color-text-dark);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .meta-data {
+            font-size: 1.4em; /* Larger meta text */
+            font-weight: 600;
+            color: var(--color-secondary);
+            margin-bottom: 40px;
+            border-left: 6px solid var(--color-secondary); /* Thicker border accent */
+            padding-left: 20px;
+            line-height: 1.3;
+            text-transform: uppercase;
+        }
+
+        /* ======================================================= */
+        /* 🌟 BUTTONS: BASE STYLES */
+        /* ======================================================= */
+        .action-buttons button,
+        .action-buttons a { /* Apply to all buttons/links in the container */
+            padding: 18px 50px; /* Larger button */
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 10px; 
+            font-size: 1.4em; 
+            font-weight: 700;
+            cursor: pointer;
+            
+            /* General transition */
+            transition: all var(--transition-speed-button) ease-in-out;
+            
+            /* Ensures buttons added via JS have display block/inline-block to fit flex */
+            display: inline-flex; 
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* --- READ BUTTON (Primary Color) --- */
+        #read-button {
+            background-color: var(--color-primary); 
+            color: white; 
+            /* Neumorphic shadow for a 'raised' button */
+            box-shadow: 3px 3px 6px rgba(134, 176, 151, 0.6), 
+                        -3px -3px 6px rgba(255, 255, 255, 0.4); 
+        }
+
+        #read-button:hover {
+            background-color: #92c4a9; /* Lighter Sage Green on hover (Color Lift) */
+            transform: translateY(-2px); 
+            box-shadow: 5px 5px 10px rgba(134, 176, 151, 0.8), 
+                        -5px -5px 10px rgba(255, 255, 255, 0.6);
+        }
+        
+        #read-button:active {
+            transform: scale(0.98); 
+            /* Inset Neumorphic shadow to look 'pressed' into the card */
+            box-shadow: inset 4px 4px 8px rgba(134, 176, 151, 0.9), 
+                        inset -4px -4px 8px rgba(255, 255, 255, 0.3);
+        }
+        
+        /* --- ADDED: SOLUTION BUTTON (Secondary Color) --- */
+        #solution-button {
+            background-color: var(--color-solution); /* Muted Lavender/Gray */
+            color: white; 
+            /* Neumorphic shadow for a 'raised' button */
+            box-shadow: 3px 3px 6px rgba(163, 155, 170, 0.6), 
+                        -3px -3px 6px rgba(255, 255, 255, 0.4); 
+        }
+        
+        #solution-button:hover {
+            background-color: #b1a7b6; /* Lighter Lavender on hover */
+            transform: translateY(-2px); 
+            box-shadow: 5px 5px 10px rgba(163, 155, 170, 0.8), 
+                        -5px -5px 10px rgba(255, 255, 255, 0.6);
+        }
+        
+        #solution-button:active {
+            transform: scale(0.98); 
+            /* Inset Neumorphic shadow */
+            box-shadow: inset 4px 4px 8px rgba(163, 155, 170, 0.9), 
+                        inset -4px -4px 8px rgba(255, 255, 255, 0.3);
+        }
+        /* END ADDED STYLES */
+        
+    </style>
+</head>
+<body>
+
+    <h1>ACADEMIC E-BOOK PORTAL // KNOWLEDGE ACCESS</h1>
+
+    <div id="main-info">
+        <div id="poster-area"></div>
+        <div id="details-area">
+        </div>
+    </div>
+    
+    <script>
+        // =======================================================
+        //                  OOP IMPLEMENTATION
+        // =======================================================
+
+        class Book {
+            constructor(title, subtitle, author, pages, coverImage, pdfPath, description) {
+                this.title = title;
+                this.subtitle = subtitle;
+                this.author = author;
+                this.pages = pages;
+                this.coverImage = coverImage;
+                this.pdfPath = pdfPath;
+                this.description = description;
+            }
+        }
+
+        class WebPage {
+            constructor(book) {
+                this.book = book;
+                // ADDED: Create a container for buttons
+                this.buttonContainer = document.createElement('div');
+                this.buttonContainer.classList.add('action-buttons');
+            }
+
+            render() {
+                this.renderDetails();
+                // Append the button container to the details area
+                document.getElementById('details-area').appendChild(this.buttonContainer);
+                
+                // Call the button setup methods
+                this.setupReadButton();
+                this.setupSolutionButton(); // <--- ADDED CALL
+            }
+
+            renderDetails() {
+                const posterArea = document.getElementById('poster-area');
+                const detailsArea = document.getElementById('details-area');
+
+                // 1. Poster
+                posterArea.innerHTML = `
+                    <img src="${this.book.coverImage}" alt="Cover of ${this.book.title}">
+                `;
+
+                // 2. Details (Title, Author, Pages, Description)
+                const detailsHTML = `
+                    <div>
+                        <h2>${this.book.title} <span>${this.book.subtitle}</span></h2>
+                        
+                        <div class="meta-data">
+                            Authored by: ${this.book.author}<br>
+                            Pages: ${this.book.pages}
+                        </div>
+                        <p>${this.book.description}</p>
+                    </div>
+                `;
+                // Set the inner HTML for details, excluding the buttons
+                detailsArea.innerHTML = detailsHTML; 
+            }
+
+            setupReadButton() {
+                const readButton = document.createElement('button');
+                readButton.id = 'read-button';
+                readButton.textContent = 'ACCESS E-BOOK // READ ONLINE';
+                
+                readButton.addEventListener('click', () => this.openProtectedReader());
+
+                // Append to the new container
+                this.buttonContainer.appendChild(readButton);
+            }
+            
+            // =======================================================
+            //                   NEW SOLUTION BUTTON LOGIC
+            // =======================================================
+            setupSolutionButton() {
+                // We use an <a> tag wrapping a <button> for proper redirection
+                const solutionLink = document.createElement('a');
+                // *** IMPORTANT: Set the target solution page URL here ***
+                solutionLink.href = 'book-solutions.html'; 
+                solutionLink.style.textDecoration = 'none'; // Remove default underline from anchor
+                
+                const solutionButton = document.createElement('button');
+                solutionButton.id = 'solution-button'; // For styling
+                solutionButton.textContent = 'VIEW SOLUTIONS 💡';
+
+                solutionLink.appendChild(solutionButton);
+                // Append the entire link/button structure to the container
+                this.buttonContainer.appendChild(solutionLink);
+            }
+            // =======================================================
+
+            /**
+             * CRITICAL: Uses Google Docs Viewer to display the PDF without the download button.
+             */
+            openProtectedReader() {
+                const pdfUrl = this.book.pdfPath; 
+
+                // Check if the path is a public URL (http/https)
+                if (pdfUrl.startsWith('http')) {
+                    const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+                    // Open in a new, controlled window/tab to simulate an embedded reader
+                    window.open(viewerUrl, 'ProtectedReader', 'width=1000,height=800,scrollbars=yes,menubar=no,toolbar=no,location=no');
+                } else {
+                    // BLOCK: Local files will always show the browser's PDF download button.
+                    alert(
+                        "🔒 Download Protection Failed:\n\n" +
+                        "You must use a **public HTTPS link** for the PDF. " +
+                        "The current value, '" + pdfUrl + "', is a local file, " +
+                        "which bypasses the Google Docs Viewer and shows the download button."
+                    );
+                    console.error("Content protection failed: PDF path must be a public HTTP/HTTPS URL.");
+                }
+            }
+        }
+
+        // =======================================================
+        //                  APPLICATION SETUP
+        // =======================================================
+        
+        const mainBook = new Book(
+            "Under the Banyan Tree",
+            "Decoding Numbers: An ISI Entrance Guide",
+            "Sumit Gupta", 
+            "310", 
+            "banyan_tree_cover.jpg", 
+            "https://my-ebook-assets.s3.us-east-1.amazonaws.com/ISI_Book_Number_Theory.pdf", // Your confirmed S3 link
+            "This essential resource is dedicated to deepening your mathematical roots and providing comprehensive preparation for the ISI entrance examination. It covers complex number theory topics in a clear, structured format, readying you for the intellectual challenge of advanced study."
+        );
+
+        const app = new WebPage(mainBook);
+        app.render();
+
+    </script>
+</body>
+</html>
