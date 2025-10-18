@@ -45,7 +45,7 @@ export class AuthModal {
   constructor(authManager) {
     this.authManager = authManager;
     this.overlay = null;
-    this.currentMode = 'signin'; // signin, signup, verify, forgot
+    this.currentMode = 'signin';
     this.tempEmail = '';
     this.onAuthSuccess = null;
   }
@@ -72,11 +72,9 @@ export class AuthModal {
   }
 
   render() {
-    // Remove existing modal if any
     const existing = document.querySelector('.auth-modal-overlay');
     if (existing) existing.remove();
 
-    // Create overlay
     this.overlay = document.createElement('div');
     this.overlay.className = 'auth-modal-overlay';
     
@@ -89,15 +87,12 @@ export class AuthModal {
 
     document.body.appendChild(this.overlay);
 
-    // Close on overlay click
     this.overlay.addEventListener('click', (e) => {
       if (e.target === this.overlay) this.hide();
     });
 
-    // Close button
     this.overlay.querySelector('.auth-modal-close').addEventListener('click', () => this.hide());
 
-    // Render content based on mode
     this.renderContent();
   }
 
@@ -322,7 +317,6 @@ export class AuthModal {
     });
 
     resendCode.addEventListener('click', async () => {
-      // Resend would require re-signup or use resendConfirmationCode
       alert('Please check your email for the code or sign up again.');
     });
   }
@@ -433,17 +427,24 @@ export class WebPage {
     if (this.options.requireAuth) {
       // Check if using Hosted UI (OAuth) or custom auth
       if (this.options.useHostedUI) {
-        // Redirect to Cognito Hosted UI for Google Sign-In
-        const cognitoDomain = this.options.cognitoDomain; // e.g., 'https://your-domain.auth.region.amazoncognito.com'
+        // FIXED: Redirect to Cognito Hosted UI for Google Sign-In
+        const cognitoDomain = this.options.cognitoDomain;
         const clientId = this.options.clientId;
-        const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
-        const responseType = 'code';
-        const scope = 'email openid profile';
+        const redirectUri = window.location.href.split('?')[0]; // Current page without query params
         
         // Store current action to resume after login
         sessionStorage.setItem('pendingAction', 'openReader');
         
-        const hostedUIUrl = `${cognitoDomain}/login?client_id=${clientId}&response_type=${responseType}&scope=${scope}&redirect_uri=${redirectUri}`;
+        // FIXED: Use /oauth2/authorize and include identity_provider=Google
+        // Try with just 'openid' scope first, add 'email profile' if enabled in Cognito
+        const hostedUIUrl = `${cognitoDomain}/oauth2/authorize?` +
+          `identity_provider=Google&` +
+          `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+          `response_type=code&` +
+          `client_id=${clientId}&` +
+          `scope=openid`;
+        
+        console.log('Redirecting to Cognito Hosted UI:', hostedUIUrl);
         window.location.href = hostedUIUrl;
         return;
       } else if (this.options.authManager) {
