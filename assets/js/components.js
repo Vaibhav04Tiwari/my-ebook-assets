@@ -430,18 +430,35 @@ export class WebPage {
     e.preventDefault();
     
     // Check if authentication is required
-    if (this.options.requireAuth && this.options.authManager) {
-      const isAuth = await this.options.authManager.isAuthenticated();
-      if (!isAuth) {
-        // Show auth modal
-        if (this.options.authModal) {
-          this.options.authModal.show('signin', () => {
-            this.openReader();
-          });
-        } else {
-          alert('Please sign in to access this content.');
-        }
+    if (this.options.requireAuth) {
+      // Check if using Hosted UI (OAuth) or custom auth
+      if (this.options.useHostedUI) {
+        // Redirect to Cognito Hosted UI for Google Sign-In
+        const cognitoDomain = this.options.cognitoDomain; // e.g., 'https://your-domain.auth.region.amazoncognito.com'
+        const clientId = this.options.clientId;
+        const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
+        const responseType = 'code';
+        const scope = 'email openid profile';
+        
+        // Store current action to resume after login
+        sessionStorage.setItem('pendingAction', 'openReader');
+        
+        const hostedUIUrl = `${cognitoDomain}/login?client_id=${clientId}&response_type=${responseType}&scope=${scope}&redirect_uri=${redirectUri}`;
+        window.location.href = hostedUIUrl;
         return;
+      } else if (this.options.authManager) {
+        // Use custom modal (old way)
+        const isAuth = await this.options.authManager.isAuthenticated();
+        if (!isAuth) {
+          if (this.options.authModal) {
+            this.options.authModal.show('signin', () => {
+              this.openReader();
+            });
+          } else {
+            alert('Please sign in to access this content.');
+          }
+          return;
+        }
       }
     }
     

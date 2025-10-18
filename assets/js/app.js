@@ -1,18 +1,40 @@
 // App entry. Decides which page to render and passes options to components.
 // Single app file reused across both pages.
 
-import { Book, WebPage, Header, Footer, AuthModal } from './components.js';
-import { AuthManager } from './auth.js';
+import { Book, WebPage, Header, Footer } from './components.js';
 
-// Initialize AWS Cognito Auth Manager
-// IMPORTANT: Replace these with your actual AWS Cognito credentials
-const authManager = new AuthManager({
-  userPoolId: 'us-east-1_9Omyjhcza',  // e.g., 'us-east-1_abcdefgh'
-  clientId: '69etrckp419t1havk13t4llo0d'        // e.g., '1234567890abcdefghijklmnop'
-});
+// Configuration for Cognito Hosted UI
+const cognitoConfig = {
+  cognitoDomain: 'https://us-east-1oeh7ih12h.auth.us-east-1.amazoncognito.com',
+  clientId: '5gfu0h940eejksp0ekuqi1s9lh', // Replace with your app client ID
+  redirectUri: window.location.origin + window.location.pathname
+};
 
-// Initialize Auth Modal
-const authModal = new AuthModal(authManager);
+// Check if user is returning from OAuth login
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('code')) {
+  // User just logged in via OAuth
+  const authCode = urlParams.get('code');
+  console.log('OAuth code received:', authCode);
+  
+  // Exchange code for tokens (you can implement this or just mark as authenticated)
+  sessionStorage.setItem('isAuthenticated', 'true');
+  
+  // Clean up URL
+  window.history.replaceState({}, document.title, window.location.pathname);
+  
+  // Check if there's a pending action
+  const pendingAction = sessionStorage.getItem('pendingAction');
+  if (pendingAction === 'openReader') {
+    sessionStorage.removeItem('pendingAction');
+    // The page will reload and the PDF will open automatically
+  }
+}
+
+// Simple auth check
+const isAuthenticated = () => {
+  return sessionStorage.getItem('isAuthenticated') === 'true';
+};
 
 const header = new Header();
 header.mount();
@@ -47,23 +69,30 @@ if (pageType === 'index') {
   // Main book page - no authentication required
   const page = new WebPage(mainBook, {
     readMode: 'viewer',
-    requireAuth: false,  // Set to true if you want to require auth for main book too
+    requireAuth: false,
     secondaryHref: 'book-solutions.html',
     secondaryLabel: 'VIEW SOLUTIONS 💡'
   });
   page.render();
 } else if (pageType === 'solutions') {
-  // Solutions page - REQUIRES authentication
+  // Solutions page - REQUIRES Google authentication via Hosted UI
   const page = new WebPage(solutionsBook, {
     readMode: 'direct',
-    requireAuth: true,                    // Authentication required for solutions
-    authManager: authManager,             // Pass auth manager
-    authModal: authModal,                 // Pass auth modal
-    primaryButtonText: 'VIEW SOLUTIONS // DOWNLOAD PDF 📥',  // Custom button text
+    requireAuth: true,
+    useHostedUI: true,                      // Use Cognito Hosted UI for Google Sign-In
+    cognitoDomain: cognitoConfig.cognitoDomain,
+    clientId: cognitoConfig.clientId,
+    primaryButtonText: 'VIEW SOLUTIONS // DOWNLOAD PDF 📥',
     secondaryHref: 'index.html',
     secondaryLabel: '← BACK TO MAIN E-BOOK'
   });
   page.render();
+  
+  // If user just authenticated and has pending action, open reader automatically
+  if (isAuthenticated() && sessionStorage.getItem('pendingAction') === 'openReader') {
+    sessionStorage.removeItem('pendingAction');
+    page.openReader();
+  }
 } else {
   // default behavior: render main book
   const page = new WebPage(mainBook, { readMode: 'viewer' });
