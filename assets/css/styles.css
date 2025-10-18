@@ -125,12 +125,13 @@ body{
 }
 .card-details p{ margin:0 0 1.75rem 0; font-size:1.05rem; line-height:1.6; color:var(--text) }
 
-/* Buttons */
+/* Buttons with Hover Effects */
 .actions{
   display:flex;
   gap:16px;
   align-items:center;
   flex-wrap:wrap;
+  margin-top: 24px;
 }
 .btn{
   border:0;
@@ -142,19 +143,67 @@ body{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  transition: transform .15s ease, box-shadow .15s ease;
+  transition: all .3s ease;
+  position: relative;
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 200px;
 }
+
+/* Primary Button */
 .btn--primary{
   background:var(--accent);
   color:#03221a;
   box-shadow: 3px 3px 10px rgba(134,176,151,0.18), -3px -3px 8px rgba(255,255,255,0.6);
 }
+
+.btn--primary:hover{
+  background: #9ac4ab;
+  transform: translateY(-3px);
+  box-shadow: 5px 10px 25px rgba(134,176,151,0.35), -3px -3px 12px rgba(255,255,255,0.8);
+}
+
+.btn--primary:active{
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 2px 4px 12px rgba(134,176,151,0.25);
+}
+
+/* Secondary Button */
 .btn--secondary{
   background:var(--muted);
   color:white;
   box-shadow: 3px 3px 10px rgba(163,155,170,0.12), -3px -3px 8px rgba(255,255,255,0.6);
 }
-.btn:active{ transform: scale(0.985) }
+
+.btn--secondary:hover{
+  background: #b5adb9;
+  transform: translateY(-3px);
+  box-shadow: 5px 10px 25px rgba(163,155,170,0.3), -3px -3px 12px rgba(255,255,255,0.8);
+}
+
+.btn--secondary:active{
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 2px 4px 12px rgba(163,155,170,0.2);
+}
+
+/* Ripple effect on click (optional) */
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+  width: 300px;
+  height: 300px;
+}
 
 /* Footer */
 .site-footer{

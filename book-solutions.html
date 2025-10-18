@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solutions Portal - Under the Banyan Tree</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solutions Portal - Under the Banyan Tree</title>
   <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/auth-modal.css">
 </head>
-<body>
-
-    <h1>ACADEMIC E-BOOK PORTAL // SOLUTION GUIDE</h1>
-
-    <div id="main-info">
-        <div id="poster-area"></div>
-        <div id="details-area">
-        </div>
-    </div>
-    
-    <script type="module" src="assets/js/app.js"></script>
+<body data-page="solutions">
+  <header id="site-header" class="site-header"></header>
+  <h1 class="site-title">ACADEMIC E-BOOK PORTAL // SOLUTION GUIDE</h1>
+  
+  <div class="card-main">
+    <div id="poster-area" class="card-media"></div>
+    <div id="details-area" class="card-details"></div>
+  </div>
+  
+  <footer id="site-footer" class="site-footer"></footer>
+  
+  <!-- AWS Cognito SDK - ADD THIS LINE -->
+ <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.6/dist/amazon-cognito-identity.min.js"></script> 
+  <!-- Your app script -->
+  <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>
