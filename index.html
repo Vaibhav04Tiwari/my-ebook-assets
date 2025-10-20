@@ -9,19 +9,91 @@
 </head>
 <body data-page="index">
   <header id="site-header" class="site-header"></header>
-  <h1 class="site-title">ACADEMIC E-BOOK PORTAL // KNOWLEDGE ACCESS</h1>
   
-  <div class="card-main">
-    <div id="poster-area" class="card-media"></div>
-    <div id="details-area" class="card-details"></div>
+  <div class="hero-section" id="home-section">
+    <h1 class="hero-title">Academic E-Book Portal</h1>
+    <p class="hero-subtitle">Access Quality Educational Resources</p>
+  </div>
+  
+  <div class="card-main" id="main-book"></div>
+
+  <!-- About Section -->
+  <div class="content-section" id="about-section">
+    <div class="section-card">
+      <h2 class="section-title">About Us</h2>
+      <p>
+        Welcome to our Academic E-Book Portal, your trusted source for quality educational materials 
+        and comprehensive study solutions. We are dedicated to making academic excellence accessible 
+        to students preparing for competitive examinations.
+      </p>
+      <h3 class="section-subtitle">Our Mission</h3>
+      <p>
+        To provide high-quality academic resources that empower students to achieve their educational 
+        goals through accessible, well-structured learning materials.
+      </p>
+      <h3 class="section-subtitle">What We Offer</h3>
+      <ul>
+        <li>Comprehensive textbooks for competitive exam preparation</li>
+        <li>Detailed solution manuals with step-by-step explanations</li>
+        <li>Access to curated educational content</li>
+        <li>Secure and user-friendly platform</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Solutions Section -->
+  <div class="content-section" id="solutions-section">
+    <div class="section-card">
+      <h2 class="section-title">Solution Materials</h2>
+      <p>
+        Access detailed solution manuals for our textbooks. Each solution is carefully crafted 
+        to help you understand complex concepts through step-by-step explanations.
+      </p>
+      <h3 class="section-subtitle">Features</h3>
+      <ul>
+        <li>Complete solutions for all exercises</li>
+        <li>Multiple approaches to problem-solving</li>
+        <li>Clear explanations and diagrams</li>
+        <li>Tips and tricks for exam preparation</li>
+      </ul>
+      <div style="margin-top: 2rem;">
+        <button class="btn btn--primary" id="solutions-btn-2">
+          <span class="btn-icon">📥</span>
+          <span>Download Solutions</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Section -->
+  <div class="content-section" id="contact-section">
+    <div class="section-card">
+      <h2 class="section-title">Contact Us</h2>
+      <p>
+        Have questions or need assistance? We're here to help. Reach out to us through any 
+        of the following channels:
+      </p>
+      <div style="margin-top: 1.5rem;">
+        <div class="contact-item">
+          <span class="contact-icon">📧</span>
+          <span>Email: <a href="mailto:krishna04tiwari@gmail.com">krishna04tiwari@gmail.com</a></span>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">💼</span>
+          <span>LinkedIn: <a href="https://www.linkedin.com/in/vaibhav-tiwari-3167062a8/" target="_blank">Vaibhav Tiwari</a></span>
+        </div>
+      </div>
+      <h3 class="section-subtitle">Business Hours</h3>
+      <p>Monday - Saturday: 9:00 AM - 6:00 PM IST<br>Sunday: Closed</p>
+    </div>
   </div>
   
   <footer id="site-footer" class="site-footer"></footer>
   
-  <!-- AWS Cognito SDK - ADD THIS LINE -->
+  <!-- AWS Cognito SDK -->
   <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.6/dist/amazon-cognito-identity.min.js"></script>
   
-  <!-- Your app script - MUST come AFTER the SDK -->
-  <script type="module" src="assets/js/app.js"></script>
+  <!-- Your app script -->
+  <script src="assets/js/app.js"></script>
 </body>
 </html>
