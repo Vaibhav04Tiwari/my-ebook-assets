@@ -133,14 +133,13 @@ class AuthenticationManager {
   }
   
   redirectToGoogleSignIn() {
-    // Get the base URL without query params or hash
-    let currentUrl = window.location.origin + window.location.pathname;
+    // Get the base URL - use root domain without trailing slash
+    let currentUrl = window.location.origin;
     
-    // Ensure we're using the correct format for Vercel
-    if (currentUrl.endsWith('/index.html')) {
-      currentUrl = currentUrl; // Keep as is
-    } else if (!currentUrl.endsWith('/')) {
-      currentUrl = currentUrl + '/'; // Add trailing slash
+    // If on a specific page (not root), include the path
+    const path = window.location.pathname;
+    if (path && path !== '/' && path !== '/index.html') {
+      currentUrl += path;
     }
     
     const authUrl = `${this.config.cognitoDomain}/oauth2/authorize?` +
@@ -166,13 +165,12 @@ class AuthenticationManager {
   }
   
   async exchangeCodeForTokens(code) {
-    // Get redirect URI in same format as authorization
-    let redirectUri = window.location.origin + window.location.pathname;
+    // Use same format as authorization
+    let redirectUri = window.location.origin;
     
-    if (redirectUri.endsWith('/index.html')) {
-      redirectUri = redirectUri;
-    } else if (!redirectUri.endsWith('/')) {
-      redirectUri = redirectUri + '/';
+    const path = window.location.pathname;
+    if (path && path !== '/' && path !== '/index.html') {
+      redirectUri += path;
     }
     
     try {
