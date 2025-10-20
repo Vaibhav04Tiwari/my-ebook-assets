@@ -646,15 +646,12 @@ class AcademicPortalApp {
     const authSuccess = await this.authManager.handleCallback();
     
     if (authSuccess) {
-      this.uiManager.removeAllModals();
-      
-      // Check if user intended to download
-      const downloadIntent = localStorage.getItem('downloadIntent');
-      if (downloadIntent === 'solutions') {
-        localStorage.removeItem('downloadIntent');
-        this.handleSuccessfulDownload();
-      }
-    }
+  this.uiManager.removeAllModals();
+
+  // ✅ Always download immediately after login
+  this.handleSuccessfulDownload();
+}
+
     
     // Setup event listeners
     this.setupEventListeners();
