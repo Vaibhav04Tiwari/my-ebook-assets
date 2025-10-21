@@ -16,6 +16,9 @@ class Config {
   static EBOOK_FILE = {
     url: 'https://my-ebook-assets.s3.us-east-1.amazonaws.com/ISI_Book_Number_Theory.pdf'
   };
+  
+  // Production redirect URI - MUST match exactly what's in Cognito
+  static REDIRECT_URI = 'https://my-ebook-assets.vercel.app';
 }
 
 // ==================== NAVIGATION MANAGER ====================
