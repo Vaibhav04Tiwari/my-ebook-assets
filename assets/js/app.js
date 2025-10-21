@@ -547,14 +547,13 @@ class Footer extends PageComponent {
           <h4>Contact</h4>
           <div class="contact-item">
             <span class="contact-icon">📧</span>
-            <a href="mailto:krishna04tiwari@gmail.com">krishna04tiwari@gmail.com</a>
+            <a href="mailto:sumiitguptame@gmail.com">sumiitguptame@gmail.com</a>
           </div>
         </div>
         <div class="footer-section">
           <h4>Connect With Us</h4>
           <div class="social-links">
-            <a href="mailto:krishna04tiwari@gmail.com" title="Email">📧</a>
-            <a href="https://www.linkedin.com/in/vaibhav-tiwari-3167062a8/" target="_blank" title="LinkedIn">💼</a>
+            <a href="https://www.linkedin.com/in/sumitgupta1?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" title="LinkedIn">💼</a>
           </div>
         </div>
       </div>
