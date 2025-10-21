@@ -443,8 +443,8 @@ class GoogleSignInModal extends Modal {
     const content = `
       <div class="auth-modal-content">
         <span class="modal-close">&times;</span>
-        <h2>Sign In to Download Solutions</h2>
-        <p>Please sign in with Google to access solution materials</p>
+        <h2>Sign In to Access E-Book</h2>
+        <p>Please sign in with Google to read the textbook</p>
         
         <div class="auth-buttons">
           <button id="google-signin-btn" class="google-btn">
@@ -646,12 +646,19 @@ class AcademicPortalApp {
     const authSuccess = await this.authManager.handleCallback();
     
     if (authSuccess) {
-  this.uiManager.removeAllModals();
-
-  // ✅ Always download immediately after login
-  this.handleSuccessfulDownload();
-}
-
+      this.uiManager.removeAllModals();
+      
+      // Check if user intended to access ebook
+      const downloadIntent = localStorage.getItem('downloadIntent');
+      if (downloadIntent === 'ebook') {
+        localStorage.removeItem('downloadIntent');
+        this.openEbookViewer();
+      } else if (downloadIntent === 'solutions') {
+        // Legacy support if any
+        localStorage.removeItem('downloadIntent');
+        this.handleSuccessfulDownload();
+      }
+    }
     
     // Setup event listeners
     this.setupEventListeners();
@@ -710,21 +717,30 @@ class AcademicPortalApp {
   }
   
   handleAccessEbook() {
-    console.log('Access E-Book clicked - Opening in embedded viewer');
+    console.log('Access E-Book clicked - Checking authentication');
+    
+    if (this.authManager.isAuthenticated()) {
+      // User is authenticated - open ebook immediately
+      this.openEbookViewer();
+    } else {
+      // Show Google Sign-In modal
+      this.uiManager.showGoogleSignInModal(() => {
+        // Store intent and redirect to Google
+        localStorage.setItem('downloadIntent', 'ebook');
+        this.authManager.redirectToGoogleSignIn();
+      });
+    }
+  }
+  
+  openEbookViewer() {
+    console.log('Opening E-Book in embedded viewer');
     this.pdfViewerManager.openEmbeddedViewer();
   }
   
   handleSolutionsClick() {
-    console.log('Solutions button clicked');
-    
-    if (this.authManager.isAuthenticated()) {
-      this.handleSuccessfulDownload();
-    } else {
-      this.uiManager.showGoogleSignInModal(() => {
-        localStorage.setItem('downloadIntent', 'solutions');
-        this.authManager.redirectToGoogleSignIn();
-      });
-    }
+    console.log('Solutions button clicked - Direct download');
+    // Direct download without authentication
+    this.handleSuccessfulDownload();
   }
   
   handleSuccessfulDownload() {
