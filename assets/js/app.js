@@ -513,7 +513,7 @@ class Header extends PageComponent {
         <nav class="main-nav">
           <a href="#home" class="nav-link active" data-section="home">Home</a>
           <a href="#about" class="nav-link" data-section="about">About</a>
-          <a href="#solutions" class="nav-link" data-section="solutions">Solutions</a>
+          <a href="#solutions" class="nav-link" data-section="solutions">Solution Book</a>
           <a href="#contact" class="nav-link" data-section="contact">Contact</a>
         </nav>
       </div>
@@ -601,7 +601,7 @@ class BookCard {
           <h2>Under the Banyan Tree
             <span>ISI Book Number Theory</span>
           </h2>
-          <div class="meta-data">Author: Academic Press | Pages: 450+ | Subject: Mathematics</div>
+          <div class="meta-data">Author: Sumit Gupta | Pages: 450+ | Subject: Mathematics</div>
           <p>
             This comprehensive textbook provides an in-depth exploration of number theory concepts, 
             specifically designed for ISI entrance examination preparation. It covers fundamental 
