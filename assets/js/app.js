@@ -514,7 +514,7 @@ class Header extends PageComponent {
           <a href="#home" class="nav-link active" data-section="home">Home</a>
           <a href="#author" class="nav-link" data-section="author">Author</a>
           <a href="#solutions" class="nav-link" data-section="solutions">Solution Book</a>
-          <a href="#terms" class="nav-link" data-section="terms">Terms</a>
+         
         </nav>
       </div>
     `;
