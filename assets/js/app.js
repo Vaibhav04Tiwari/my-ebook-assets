@@ -26,9 +26,9 @@ class NavigationManager {
   constructor() {
     this.sections = {
       'home': document.getElementById('main-book'),
-      'about': document.getElementById('about-section'),
+      'author': document.getElementById('author-section'),
       'solutions': document.getElementById('solutions-section'),
-      'contact': document.getElementById('contact-section')
+      'terms': document.getElementById('terms-section')
     };
     this.heroSection = document.getElementById('home-section');
     this.currentSection = 'home';
@@ -512,9 +512,9 @@ class Header extends PageComponent {
         </a>
         <nav class="main-nav">
           <a href="#home" class="nav-link active" data-section="home">Home</a>
-          <a href="#about" class="nav-link" data-section="about">About</a>
+          <a href="#author" class="nav-link" data-section="author">Author</a>
           <a href="#solutions" class="nav-link" data-section="solutions">Solution Book</a>
-          <a href="#contact" class="nav-link" data-section="contact">Contact</a>
+          <a href="#terms" class="nav-link" data-section="terms">Terms</a>
         </nav>
       </div>
     `;
@@ -531,24 +531,13 @@ class Footer extends PageComponent {
     const content = `
       <div class="footer-content">
         <div class="footer-section">
-          <h4>About Us</h4>
-          <p>Your trusted source for academic materials and comprehensive study solutions for competitive examinations.</p>
-        </div>
-        <div class="footer-section">
           <h4>Quick Links</h4>
           <ul>
             <li><a href="#home" data-section="home">Home</a></li>
-            <li><a href="#about" data-section="about">About</a></li>
+            <li><a href="#author" data-section="author">Author</a></li>
             <li><a href="#solutions" data-section="solutions">Solutions</a></li>
-            <li><a href="#contact" data-section="contact">Contact</a></li>
+            <li><a href="#terms" data-section="terms">Terms & Conditions</a></li>
           </ul>
-        </div>
-        <div class="footer-section">
-          <h4>Contact</h4>
-          <div class="contact-item">
-            <span class="contact-icon">📧</span>
-            <a href="mailto:sumiitguptame@gmail.com">sumiitguptame@gmail.com</a>
-          </div>
         </div>
         <div class="footer-section">
           <h4>Connect With Us</h4>
