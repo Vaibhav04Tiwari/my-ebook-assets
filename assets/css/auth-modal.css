@@ -21,6 +21,7 @@
   max-width: 480px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideDown 0.4s ease;
+  position: relative;
 }
 
 @keyframes slideDown {
@@ -42,6 +43,14 @@
   font-weight: 700;
 }
 
+.auth-modal-content h3 {
+  color: #2f5d3f;
+  margin-bottom: 10px;
+  font-size: 24px;
+  text-align: center;
+  font-weight: 700;
+}
+
 .auth-modal-content p {
   color: #79838b;
   margin-bottom: 35px;
@@ -50,20 +59,28 @@
   line-height: 1.5;
 }
 
-.auth-close {
+.modal-close {
   color: #a39baa;
-  float: right;
+  position: absolute;
+  top: 20px;
+  right: 25px;
   font-size: 32px;
   font-weight: 300;
   cursor: pointer;
   line-height: 20px;
-  margin-top: -30px;
-  margin-right: -20px;
   transition: color 0.3s ease;
+  background: none;
+  border: none;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.auth-close:hover,
-.auth-close:focus {
+.modal-close:hover,
+.modal-close:focus {
   color: #86b097;
 }
 
@@ -115,7 +132,56 @@
   font-weight: 500;
 }
 
-/* Download Modal Styles */
+/* Loading Modal */
+.loading-content {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #86b097;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error Modal */
+.error-content {
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.error-content .btn {
+  margin-top: 1.5rem;
+  padding: 0.75rem 2rem;
+  background: #2f5d3f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.error-content .btn:hover {
+  background: #1e3d2a;
+  transform: translateY(-2px);
+}
+
+/* Download Section */
 .download-section {
   display: flex;
   flex-direction: column;
@@ -151,30 +217,6 @@
   box-shadow: 0 4px 15px rgba(134, 176, 151, 0.25);
 }
 
-.download-close {
-  color: #a39baa;
-  float: right;
-  font-size: 32px;
-  font-weight: 300;
-  cursor: pointer;
-  line-height: 20px;
-  margin-top: -30px;
-  margin-right: -20px;
-  transition: color 0.3s ease;
-}
-
-.download-close:hover,
-.download-close:focus {
-  color: #86b097;
-}
-
-/* Success checkmark */
-.auth-modal-content h2::before {
-  content: '';
-  display: inline-block;
-  margin-right: 8px;
-}
-
 /* Responsive Design */
 @media (max-width: 600px) {
   .auth-modal-content {
@@ -187,6 +229,10 @@
     font-size: 24px;
   }
   
+  .auth-modal-content h3 {
+    font-size: 20px;
+  }
+  
   .google-btn {
     font-size: 15px;
     padding: 14px 22px;
@@ -195,5 +241,11 @@
   .download-btn {
     font-size: 15px;
     padding: 15px 26px;
+  }
+  
+  .modal-close {
+    top: 15px;
+    right: 15px;
+    font-size: 28px;
   }
 }

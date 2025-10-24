@@ -223,6 +223,10 @@ class AuthenticationManager {
 class PDFViewerManager {
   constructor(ebookUrl) {
     this.ebookUrl = ebookUrl;
+    this.currentPage = 1;
+    this.totalPages = null;
+    this.currentZoom = 100;
+    this.iframe = null;
   }
   
   openEmbeddedViewer() {
@@ -240,19 +244,29 @@ class PDFViewerManager {
             <span class="viewer-icon">📖</span>
             <span>Under the Banyan Tree - ISI Book Number Theory</span>
           </div>
-          <div class="pdf-viewer-controls">
-            <input type="number" id="page-input" placeholder="Page" min="1" style="width: 60px; padding: 5px; margin-right: 10px; border: 1px solid #ddd; border-radius: 4px;">
-            <button id="go-to-page" style="padding: 5px 15px; margin-right: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Go</button>
-            <button id="zoom-out" style="padding: 5px 10px; margin-right: 5px; background: #555; color: white; border: none; border-radius: 4px; cursor: pointer;">-</button>
-            <button id="zoom-in" style="padding: 5px 10px; margin-right: 10px; background: #555; color: white; border: none; border-radius: 4px; cursor: pointer;">+</button>
-            <span id="zoom-level" style="color: white; margin-right: 10px;">100%</span>
+          <div class="pdf-controls">
+            <button class="pdf-control-btn" id="zoom-out" title="Zoom Out">
+              <span>−</span>
+            </button>
+            <span class="zoom-level" id="zoom-level">100%</span>
+            <button class="pdf-control-btn" id="zoom-in" title="Zoom In">
+              <span>+</span>
+            </button>
+            <span class="control-divider">|</span>
+            <button class="pdf-control-btn" id="prev-page" title="Previous Page">
+              <span>◄</span>
+            </button>
+            <span class="page-info" id="page-info">Page 1</span>
+            <button class="pdf-control-btn" id="next-page" title="Next Page">
+              <span>►</span>
+            </button>
           </div>
           <button class="pdf-viewer-close">&times;</button>
         </div>
-        <div class="pdf-viewer-container" id="pdf-container">
+        <div class="pdf-viewer-container">
           <iframe 
             id="pdf-iframe"
-            src="${this.ebookUrl}#toolbar=1&navpanes=1&scrollbar=1&view=FitH" 
+            src="${this.ebookUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH" 
             frameborder="0"
             allowfullscreen>
           </iframe>
@@ -263,16 +277,17 @@ class PDFViewerManager {
     document.body.insertAdjacentHTML('beforeend', viewerHTML);
     document.body.style.overflow = 'hidden';
     
+    this.iframe = document.getElementById('pdf-iframe');
+    this.setupControls();
+  }
+  
+  setupControls() {
     const closeBtn = document.querySelector('.pdf-viewer-close');
     const overlay = document.querySelector('.pdf-viewer-overlay');
-    const iframe = document.getElementById('pdf-iframe');
-    const pageInput = document.getElementById('page-input');
-    const goToPageBtn = document.getElementById('go-to-page');
-    const zoomInBtn = document.getElementById('zoom-in');
-    const zoomOutBtn = document.getElementById('zoom-out');
-    const zoomLevelSpan = document.getElementById('zoom-level');
-    
-    let currentZoom = 100;
+    const zoomIn = document.getElementById('zoom-in');
+    const zoomOut = document.getElementById('zoom-out');
+    const prevPage = document.getElementById('prev-page');
+    const nextPage = document.getElementById('next-page');
     
     const closeViewer = () => {
       overlay.remove();
@@ -281,45 +296,65 @@ class PDFViewerManager {
     
     closeBtn.onclick = closeViewer;
     
-    // Page navigation
-    goToPageBtn.onclick = () => {
-      const pageNum = parseInt(pageInput.value);
-      if (pageNum && pageNum > 0) {
-        iframe.src = `${this.ebookUrl}#page=${pageNum}&toolbar=1&navpanes=1&scrollbar=1&view=FitH`;
-      }
-    };
-    
-    pageInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        goToPageBtn.click();
-      }
-    });
-    
     // Zoom controls
-    zoomInBtn.onclick = () => {
-      currentZoom += 10;
-      if (currentZoom > 200) currentZoom = 200;
-      iframe.style.transform = `scale(${currentZoom / 100})`;
-      iframe.style.transformOrigin = 'top center';
-      zoomLevelSpan.textContent = `${currentZoom}%`;
-    };
+    zoomIn.onclick = () => this.adjustZoom(10);
+    zoomOut.onclick = () => this.adjustZoom(-10);
     
-    zoomOutBtn.onclick = () => {
-      currentZoom -= 10;
-      if (currentZoom < 50) currentZoom = 50;
-      iframe.style.transform = `scale(${currentZoom / 100})`;
-      iframe.style.transformOrigin = 'top center';
-      zoomLevelSpan.textContent = `${currentZoom}%`;
-    };
+    // Page navigation
+    prevPage.onclick = () => this.navigatePage(-1);
+    nextPage.onclick = () => this.navigatePage(1);
     
-    document.addEventListener('keydown', function escHandler(e) {
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (!overlay.parentNode) return;
+      
       if (e.key === 'Escape') {
-        if (overlay && overlay.parentNode) {
-          closeViewer();
-        }
-        document.removeEventListener('keydown', escHandler);
+        closeViewer();
+      } else if (e.key === '+' || e.key === '=') {
+        this.adjustZoom(10);
+      } else if (e.key === '-') {
+        this.adjustZoom(-10);
+      } else if (e.key === 'ArrowLeft') {
+        this.navigatePage(-1);
+      } else if (e.key === 'ArrowRight') {
+        this.navigatePage(1);
       }
     });
+  }
+  
+  adjustZoom(delta) {
+    this.currentZoom = Math.max(50, Math.min(200, this.currentZoom + delta));
+    const zoomLevel = document.getElementById('zoom-level');
+    if (zoomLevel) {
+      zoomLevel.textContent = `${this.currentZoom}%`;
+    }
+    
+    // Update iframe zoom
+    if (this.iframe) {
+      this.iframe.style.transform = `scale(${this.currentZoom / 100})`;
+      this.iframe.style.transformOrigin = 'top center';
+      if (this.currentZoom > 100) {
+        this.iframe.style.width = `${100 * (100 / this.currentZoom)}%`;
+        this.iframe.style.height = `${100 * (100 / this.currentZoom)}%`;
+      } else {
+        this.iframe.style.width = '100%';
+        this.iframe.style.height = '100%';
+      }
+    }
+  }
+  
+  navigatePage(delta) {
+    this.currentPage = Math.max(1, this.currentPage + delta);
+    const pageInfo = document.getElementById('page-info');
+    if (pageInfo) {
+      pageInfo.textContent = `Page ${this.currentPage}`;
+    }
+    
+    // Update iframe source with page number
+    if (this.iframe) {
+      const baseUrl = this.ebookUrl.split('#')[0];
+      this.iframe.src = `${baseUrl}#page=${this.currentPage}&toolbar=0&navpanes=0&scrollbar=1&view=FitH`;
+    }
   }
 }
 
@@ -576,21 +611,14 @@ class Footer extends PageComponent {
   render() {
     const content = `
       <div class="footer-content">
-        <div class="footer-section" style="max-width: 800px; margin: 0 auto;">
-          <h4>Terms and Conditions</h4>
-          <p style="font-size: 0.9rem; line-height: 1.6; text-align: justify;">
-            <strong>Under the Banyan Tree: Solutions to Decoding Numbers</strong> by Sumit Gupta. 
-            Copyright © 2025 Sumit Gupta. All rights reserved. First Edition: October 2025. 
-            No part of this material may be reproduced or utilized in any form without written permission. 
-            While the author has used good faith effort to ensure accuracy, the author disclaims all responsibility 
-            for errors, omissions, or damages resulting from the use of or reliance on the information contained herein. 
-            Materials are provided "as is" without warranty of any kind. The author shall not be liable for any damages 
-            arising out of the use or inability to use these materials. For personal, non-commercial educational use only.
-          </p>
-          <p style="font-size: 0.85rem; margin-top: 1rem;">
-            <a href="#terms" data-section="terms" style="color: #4CAF50; text-decoration: none;">View Full Terms & Conditions</a> | 
-            Contact: <a href="mailto:thebanyantreebook@gmail.com" style="color: #4CAF50; text-decoration: none;">thebanyantreebook@gmail.com</a>
-          </p>
+        <div class="footer-section">
+          <h4>Contact</h4>
+          <p>Email: <a href="mailto:thebanyantreebook@gmail.com">thebanyantreebook@gmail.com</a></p>
+          <p>LinkedIn: <a href="https://www.linkedin.com/in/sumitgupta1?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank">Sumit Gupta</a></p>
+        </div>
+        <div class="footer-section">
+          <h4>Terms & Conditions</h4>
+          <p><a href="#terms" data-section="terms">View Terms & Conditions</a></p>
         </div>
       </div>
       <div class="footer-bottom">
