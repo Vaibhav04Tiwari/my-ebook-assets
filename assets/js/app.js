@@ -240,11 +240,19 @@ class PDFViewerManager {
             <span class="viewer-icon">📖</span>
             <span>Under the Banyan Tree - ISI Book Number Theory</span>
           </div>
+          <div class="pdf-viewer-controls">
+            <input type="number" id="page-input" placeholder="Page" min="1" style="width: 60px; padding: 5px; margin-right: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <button id="go-to-page" style="padding: 5px 15px; margin-right: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Go</button>
+            <button id="zoom-out" style="padding: 5px 10px; margin-right: 5px; background: #555; color: white; border: none; border-radius: 4px; cursor: pointer;">-</button>
+            <button id="zoom-in" style="padding: 5px 10px; margin-right: 10px; background: #555; color: white; border: none; border-radius: 4px; cursor: pointer;">+</button>
+            <span id="zoom-level" style="color: white; margin-right: 10px;">100%</span>
+          </div>
           <button class="pdf-viewer-close">&times;</button>
         </div>
-        <div class="pdf-viewer-container">
+        <div class="pdf-viewer-container" id="pdf-container">
           <iframe 
-            src="${this.ebookUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH" 
+            id="pdf-iframe"
+            src="${this.ebookUrl}#toolbar=1&navpanes=1&scrollbar=1&view=FitH" 
             frameborder="0"
             allowfullscreen>
           </iframe>
@@ -257,6 +265,14 @@ class PDFViewerManager {
     
     const closeBtn = document.querySelector('.pdf-viewer-close');
     const overlay = document.querySelector('.pdf-viewer-overlay');
+    const iframe = document.getElementById('pdf-iframe');
+    const pageInput = document.getElementById('page-input');
+    const goToPageBtn = document.getElementById('go-to-page');
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomLevelSpan = document.getElementById('zoom-level');
+    
+    let currentZoom = 100;
     
     const closeViewer = () => {
       overlay.remove();
@@ -264,6 +280,37 @@ class PDFViewerManager {
     };
     
     closeBtn.onclick = closeViewer;
+    
+    // Page navigation
+    goToPageBtn.onclick = () => {
+      const pageNum = parseInt(pageInput.value);
+      if (pageNum && pageNum > 0) {
+        iframe.src = `${this.ebookUrl}#page=${pageNum}&toolbar=1&navpanes=1&scrollbar=1&view=FitH`;
+      }
+    };
+    
+    pageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        goToPageBtn.click();
+      }
+    });
+    
+    // Zoom controls
+    zoomInBtn.onclick = () => {
+      currentZoom += 10;
+      if (currentZoom > 200) currentZoom = 200;
+      iframe.style.transform = `scale(${currentZoom / 100})`;
+      iframe.style.transformOrigin = 'top center';
+      zoomLevelSpan.textContent = `${currentZoom}%`;
+    };
+    
+    zoomOutBtn.onclick = () => {
+      currentZoom -= 10;
+      if (currentZoom < 50) currentZoom = 50;
+      iframe.style.transform = `scale(${currentZoom / 100})`;
+      iframe.style.transformOrigin = 'top center';
+      zoomLevelSpan.textContent = `${currentZoom}%`;
+    };
     
     document.addEventListener('keydown', function escHandler(e) {
       if (e.key === 'Escape') {
