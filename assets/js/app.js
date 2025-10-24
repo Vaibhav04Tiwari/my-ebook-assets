@@ -514,7 +514,6 @@ class Header extends PageComponent {
           <a href="#home" class="nav-link active" data-section="home">Home</a>
           <a href="#author" class="nav-link" data-section="author">Author</a>
           <a href="#solutions" class="nav-link" data-section="solutions">Solution Book</a>
-         
         </nav>
       </div>
     `;
@@ -530,20 +529,21 @@ class Footer extends PageComponent {
   render() {
     const content = `
       <div class="footer-content">
-        <div class="footer-section">
-          <h4>Quick Links</h4>
-          <ul>
-            <li><a href="#home" data-section="home">Home</a></li>
-            <li><a href="#author" data-section="author">Author</a></li>
-            <li><a href="#solutions" data-section="solutions">Solutions</a></li>
-            <li><a href="#terms" data-section="terms">Terms & Conditions</a></li>
-          </ul>
-        </div>
-        <div class="footer-section">
-          <h4>Connect With Us</h4>
-          <div class="social-links">
-            <a href="https://www.linkedin.com/in/sumitgupta1?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" title="LinkedIn">💼</a>
-          </div>
+        <div class="footer-section" style="max-width: 800px; margin: 0 auto;">
+          <h4>Terms and Conditions</h4>
+          <p style="font-size: 0.9rem; line-height: 1.6; text-align: justify;">
+            <strong>Under the Banyan Tree: Solutions to Decoding Numbers</strong> by Sumit Gupta. 
+            Copyright © 2025 Sumit Gupta. All rights reserved. First Edition: October 2025. 
+            No part of this material may be reproduced or utilized in any form without written permission. 
+            While the author has used good faith effort to ensure accuracy, the author disclaims all responsibility 
+            for errors, omissions, or damages resulting from the use of or reliance on the information contained herein. 
+            Materials are provided "as is" without warranty of any kind. The author shall not be liable for any damages 
+            arising out of the use or inability to use these materials. For personal, non-commercial educational use only.
+          </p>
+          <p style="font-size: 0.85rem; margin-top: 1rem;">
+            <a href="#terms" data-section="terms" style="color: #4CAF50; text-decoration: none;">View Full Terms & Conditions</a> | 
+            Contact: <a href="mailto:thebanyantreebook@gmail.com" style="color: #4CAF50; text-decoration: none;">thebanyantreebook@gmail.com</a>
+          </p>
         </div>
       </div>
       <div class="footer-bottom">
