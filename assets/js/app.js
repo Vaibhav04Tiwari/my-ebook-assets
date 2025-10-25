@@ -225,6 +225,8 @@ class PDFViewerManager {
     this.ebookUrl = ebookUrl;
     this.currentPage = 1;
     this.currentZoom = 100;
+    this.iframe = null;
+    this.container = null;
   }
   
   openEmbeddedViewer() {
@@ -236,28 +238,36 @@ class PDFViewerManager {
     console.log('Opening E-Book in embedded viewer');
     
     const viewerHTML = `
-      <div class="pdf-viewer-overlay">
+      <div class="pdf-viewer-overlay" id="pdf-overlay">
         <div class="pdf-viewer-header">
           <div class="pdf-viewer-title">
             <span class="viewer-icon">📖</span>
             <span>Under the Banyan Tree - Decoding Numbers</span>
           </div>
           <div class="pdf-viewer-controls">
-            <button id="zoom-out" class="pdf-control-btn" title="Zoom Out">−</button>
-            <span id="zoom-level" class="zoom-display">100%</span>
-            <button id="zoom-in" class="pdf-control-btn" title="Zoom In">+</button>
+            <button id="zoom-out-btn" class="pdf-control-btn" title="Zoom Out">
+              <span style="font-size: 20px; line-height: 1;">−</span>
+            </button>
+            <span id="zoom-level-display" class="zoom-display">100%</span>
+            <button id="zoom-in-btn" class="pdf-control-btn" title="Zoom In">
+              <span style="font-size: 20px; line-height: 1;">+</span>
+            </button>
             <span class="control-divider">|</span>
-            <button id="prev-page" class="pdf-control-btn" title="Previous Page">◄</button>
-            <input type="number" id="page-input" class="page-input" min="1" value="1" placeholder="1">
-            <button id="go-page" class="pdf-control-btn" title="Go to Page">Go</button>
-            <button id="next-page" class="pdf-control-btn" title="Next Page">►</button>
+            <button id="prev-page-btn" class="pdf-control-btn" title="Previous Page">
+              <span>◄</span>
+            </button>
+            <input type="number" id="page-number-input" class="page-input" min="1" value="1">
+            <button id="go-page-btn" class="pdf-control-btn" title="Go to Page">Go</button>
+            <button id="next-page-btn" class="pdf-control-btn" title="Next Page">
+              <span>►</span>
+            </button>
           </div>
-          <button class="pdf-viewer-close">&times;</button>
+          <button class="pdf-viewer-close" id="close-viewer-btn">&times;</button>
         </div>
-        <div class="pdf-viewer-container">
+        <div class="pdf-viewer-container" id="pdf-container-main">
           <iframe 
-            id="pdf-iframe"
-            src="${this.ebookUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH" 
+            id="pdf-iframe-viewer"
+            src="${this.ebookUrl}#page=1&zoom=100&toolbar=0&navpanes=0" 
             frameborder="0"
             allowfullscreen>
           </iframe>
@@ -268,102 +278,124 @@ class PDFViewerManager {
     document.body.insertAdjacentHTML('beforeend', viewerHTML);
     document.body.style.overflow = 'hidden';
     
+    // Get references
+    this.iframe = document.getElementById('pdf-iframe-viewer');
+    this.container = document.getElementById('pdf-container-main');
+    
     this.setupControls();
   }
   
   setupControls() {
-    const closeBtn = document.querySelector('.pdf-viewer-close');
-    const overlay = document.querySelector('.pdf-viewer-overlay');
-    const iframe = document.getElementById('pdf-iframe');
-    const container = document.querySelector('.pdf-viewer-container');
-    const zoomIn = document.getElementById('zoom-in');
-    const zoomOut = document.getElementById('zoom-out');
-    const zoomLevel = document.getElementById('zoom-level');
-    const prevPage = document.getElementById('prev-page');
-    const nextPage = document.getElementById('next-page');
-    const pageInput = document.getElementById('page-input');
-    const goPage = document.getElementById('go-page');
+    const overlay = document.getElementById('pdf-overlay');
+    const closeBtn = document.getElementById('close-viewer-btn');
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+    const zoomDisplay = document.getElementById('zoom-level-display');
+    const prevPageBtn = document.getElementById('prev-page-btn');
+    const nextPageBtn = document.getElementById('next-page-btn');
+    const pageInput = document.getElementById('page-number-input');
+    const goPageBtn = document.getElementById('go-page-btn');
     
-    const closeViewer = () => {
+    // Close viewer
+    closeBtn.addEventListener('click', () => {
       overlay.remove();
       document.body.style.overflow = '';
-    };
+    });
     
-    closeBtn.onclick = closeViewer;
+    // Zoom In
+    zoomInBtn.addEventListener('click', () => {
+      this.currentZoom += 10;
+      if (this.currentZoom > 200) this.currentZoom = 200;
+      this.applyZoom();
+      zoomDisplay.textContent = this.currentZoom + '%';
+      console.log('Zoom in:', this.currentZoom);
+    });
     
-    // Zoom controls - properly zooms the PDF
-    zoomIn.onclick = () => {
-      this.currentZoom = Math.min(200, this.currentZoom + 10);
-      this.applyZoom(iframe, container);
-      zoomLevel.textContent = `${this.currentZoom}%`;
-    };
+    // Zoom Out
+    zoomOutBtn.addEventListener('click', () => {
+      this.currentZoom -= 10;
+      if (this.currentZoom < 50) this.currentZoom = 50;
+      this.applyZoom();
+      zoomDisplay.textContent = this.currentZoom + '%';
+      console.log('Zoom out:', this.currentZoom);
+    });
     
-    zoomOut.onclick = () => {
-      this.currentZoom = Math.max(50, this.currentZoom - 10);
-      this.applyZoom(iframe, container);
-      zoomLevel.textContent = `${this.currentZoom}%`;
-    };
-    
-    // Page navigation
-    const navigateToPage = (page) => {
-      if (page && page > 0) {
-        this.currentPage = page;
-        pageInput.value = page;
-        const baseUrl = this.ebookUrl.split('#')[0];
-        iframe.src = `${baseUrl}#page=${page}&toolbar=0&navpanes=0&scrollbar=1&view=FitH`;
+    // Previous Page
+    prevPageBtn.addEventListener('click', () => {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+        this.goToPage(this.currentPage);
+        pageInput.value = this.currentPage;
+        console.log('Previous page:', this.currentPage);
       }
-    };
+    });
     
-    prevPage.onclick = () => {
-      this.currentPage = Math.max(1, this.currentPage - 1);
-      navigateToPage(this.currentPage);
-    };
-    
-    nextPage.onclick = () => {
+    // Next Page
+    nextPageBtn.addEventListener('click', () => {
       this.currentPage++;
-      navigateToPage(this.currentPage);
-    };
+      this.goToPage(this.currentPage);
+      pageInput.value = this.currentPage;
+      console.log('Next page:', this.currentPage);
+    });
     
-    goPage.onclick = () => {
+    // Go to Page
+    goPageBtn.addEventListener('click', () => {
       const page = parseInt(pageInput.value);
       if (page && page > 0) {
-        navigateToPage(page);
+        this.currentPage = page;
+        this.goToPage(page);
+        console.log('Go to page:', page);
       }
-    };
+    });
     
+    // Enter key on page input
     pageInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-        const page = parseInt(pageInput.value);
-        if (page && page > 0) {
-          navigateToPage(page);
-        }
+        goPageBtn.click();
       }
     });
     
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-      if (!overlay.parentNode) return;
+      if (!overlay || !overlay.parentNode) return;
       
-      if (e.key === 'Escape') {
-        closeViewer();
-      } else if (e.key === 'ArrowLeft') {
-        prevPage.click();
-      } else if (e.key === 'ArrowRight') {
-        nextPage.click();
-      } else if (e.key === '+' || e.key === '=') {
-        zoomIn.click();
-      } else if (e.key === '-') {
-        zoomOut.click();
+      switch(e.key) {
+        case 'Escape':
+          closeBtn.click();
+          break;
+        case 'ArrowLeft':
+          prevPageBtn.click();
+          break;
+        case 'ArrowRight':
+          nextPageBtn.click();
+          break;
+        case '+':
+        case '=':
+          zoomInBtn.click();
+          break;
+        case '-':
+          zoomOutBtn.click();
+          break;
       }
     });
   }
   
-  applyZoom(iframe, container) {
+  applyZoom() {
+    if (!this.iframe) return;
+    
     const scale = this.currentZoom / 100;
-    iframe.style.transform = `scale(${scale})`;
-    iframe.style.transformOrigin = 'top left';
-    iframe.style.width = `${100 / scale}%`;
-    iframe.style.height = `${100 / scale}%`;
+    this.iframe.style.transform = `scale(${scale})`;
+    this.iframe.style.transformOrigin = 'top left';
+    this.iframe.style.width = `${100 / scale}%`;
+    this.iframe.style.height = `${100 / scale}%`;
+  }
+  
+  goToPage(pageNumber) {
+    if (!this.iframe) return;
+    
+    const baseUrl = this.ebookUrl.split('#')[0];
+    const newUrl = `${baseUrl}#page=${pageNumber}&zoom=100&toolbar=0&navpanes=0`;
+    this.iframe.src = newUrl;
   }
 }
 

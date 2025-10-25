@@ -551,23 +551,18 @@ body {
   color: var(--text-medium);
 }
 
-/* PDF Viewer Overlay */
+/* PDF Viewer Overlay - Complete Rewrite */
 .pdf-viewer-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.92);
-  z-index: 2000;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .pdf-viewer-header {
@@ -576,7 +571,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(216, 226, 220, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
 }
 
 .pdf-viewer-title {
@@ -592,6 +588,93 @@ body {
   font-size: 1.3rem;
 }
 
+.pdf-viewer-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.pdf-control-btn {
+  background: #3d5e47;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-width: 38px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.pdf-control-btn:hover {
+  background: #4a7356;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.pdf-control-btn:active {
+  transform: translateY(0);
+  background: #2f4a3a;
+}
+
+.zoom-display {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 50px;
+  text-align: center;
+  padding: 0 6px;
+  user-select: none;
+}
+
+.page-input {
+  width: 65px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  height: 34px;
+}
+
+.page-input:focus {
+  outline: none;
+  border-color: #4a7356;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.page-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Remove number input arrows */
+.page-input::-webkit-inner-spin-button,
+.page-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.page-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.control-divider {
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 4px;
+  font-size: 16px;
+  user-select: none;
+}
+
 .pdf-viewer-close {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -599,7 +682,7 @@ body {
   font-size: 1.8rem;
   width: 40px;
   height: 40px;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -607,17 +690,21 @@ body {
   transition: all 0.2s ease;
   line-height: 1;
   padding: 0;
+  flex-shrink: 0;
 }
 
 .pdf-viewer-close:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 77, 77, 0.8);
+  border-color: rgba(255, 77, 77, 0.9);
 }
 
 .pdf-viewer-container {
   flex: 1;
   background: #1a1a1a;
   position: relative;
-  overflow: hidden;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
 }
 
 .pdf-viewer-container iframe {
@@ -625,6 +712,55 @@ body {
   height: 100%;
   border: none;
   background: white;
+  display: block;
+}
+
+/* Responsive PDF Viewer */
+@media (max-width: 768px) {
+  .pdf-viewer-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0.8rem 1rem;
+  }
+  
+  .pdf-viewer-title {
+    font-size: 0.85rem;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .pdf-viewer-controls {
+    width: calc(100% - 50px);
+    justify-content: center;
+    gap: 6px;
+  }
+  
+  .pdf-control-btn {
+    padding: 5px 10px;
+    font-size: 13px;
+    min-width: 32px;
+    height: 30px;
+  }
+  
+  .page-input {
+    width: 55px;
+    height: 30px;
+    font-size: 13px;
+  }
+  
+  .zoom-display {
+    font-size: 12px;
+    min-width: 45px;
+  }
+  
+  .pdf-viewer-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 1.5rem;
+  }
 }
 
 /* Responsive */
