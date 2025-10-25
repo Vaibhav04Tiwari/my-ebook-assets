@@ -6,6 +6,49 @@
   <title>Academic E-Book Portal - Under the Banyan Tree</title>
   <link rel="stylesheet" href="assets/css/styles.css">
   <link rel="stylesheet" href="assets/css/auth-modal.css">
+  <style>
+    /* PDF Viewer Control Styles */
+    .pdf-viewer-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .pdf-control-btn {
+      background: #2d5a3d;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    
+    .pdf-control-btn:hover {
+      background: #4CAF50;
+    }
+    
+    .zoom-display {
+      color: white;
+      font-size: 14px;
+      min-width: 50px;
+      text-align: center;
+    }
+    
+    .page-input {
+      width: 60px;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      text-align: center;
+    }
+    
+    .divider {
+      color: #ccc;
+      margin: 0 5px;
+    }
+  </style>
 </head>
 <body data-page="index">
   <header id="site-header" class="site-header"></header>
@@ -193,7 +236,6 @@
   <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.6/dist/amazon-cognito-identity.min.js"></script>
   
   <!-- Your app script -->
-  <script src="assets/js/app.js">
-  </script>
+  <script src="assets/js/app.js"></script>
 </body>
 </html>

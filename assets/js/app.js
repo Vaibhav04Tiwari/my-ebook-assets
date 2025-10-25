@@ -224,9 +224,7 @@ class PDFViewerManager {
   constructor(ebookUrl) {
     this.ebookUrl = ebookUrl;
     this.currentPage = 1;
-    this.totalPages = null;
-    this.currentZoom = 100;
-    this.iframe = null;
+    this.currentZoom = 1.0;
   }
   
   openEmbeddedViewer() {
@@ -242,34 +240,29 @@ class PDFViewerManager {
         <div class="pdf-viewer-header">
           <div class="pdf-viewer-title">
             <span class="viewer-icon">📖</span>
-            <span>Under the Banyan Tree - ISI Book Number Theory</span>
+            <span>Under the Banyan Tree - Decoding Numbers</span>
           </div>
-          <div class="pdf-controls">
-            <button class="pdf-control-btn" id="zoom-out" title="Zoom Out">
-              <span>−</span>
-            </button>
-            <span class="zoom-level" id="zoom-level">100%</span>
-            <button class="pdf-control-btn" id="zoom-in" title="Zoom In">
-              <span>+</span>
-            </button>
-            <span class="control-divider">|</span>
-            <button class="pdf-control-btn" id="prev-page" title="Previous Page">
-              <span>◄</span>
-            </button>
-            <span class="page-info" id="page-info">Page 1</span>
-            <button class="pdf-control-btn" id="next-page" title="Next Page">
-              <span>►</span>
-            </button>
+          <div class="pdf-viewer-controls">
+            <button id="zoom-out" class="pdf-control-btn" title="Zoom Out">−</button>
+            <span id="zoom-level" class="zoom-display">100%</span>
+            <button id="zoom-in" class="pdf-control-btn" title="Zoom In">+</button>
+            <span class="divider">|</span>
+            <button id="prev-page" class="pdf-control-btn" title="Previous Page">◄</button>
+            <input type="number" id="page-input" class="page-input" min="1" placeholder="Page">
+            <button id="go-page" class="pdf-control-btn" title="Go to Page">Go</button>
+            <button id="next-page" class="pdf-control-btn" title="Next Page">►</button>
           </div>
           <button class="pdf-viewer-close">&times;</button>
         </div>
         <div class="pdf-viewer-container">
-          <iframe 
-            id="pdf-iframe"
-            src="${this.ebookUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH" 
-            frameborder="0"
-            allowfullscreen>
-          </iframe>
+          <div id="pdf-wrapper" style="overflow: auto; width: 100%; height: 100%;">
+            <iframe 
+              id="pdf-iframe"
+              src="${this.ebookUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH" 
+              style="border: none; width: 100%; height: 100%; display: block;"
+              allowfullscreen>
+            </iframe>
+          </div>
         </div>
       </div>
     `;
@@ -277,17 +270,21 @@ class PDFViewerManager {
     document.body.insertAdjacentHTML('beforeend', viewerHTML);
     document.body.style.overflow = 'hidden';
     
-    this.iframe = document.getElementById('pdf-iframe');
     this.setupControls();
   }
   
   setupControls() {
     const closeBtn = document.querySelector('.pdf-viewer-close');
     const overlay = document.querySelector('.pdf-viewer-overlay');
+    const iframe = document.getElementById('pdf-iframe');
+    const wrapper = document.getElementById('pdf-wrapper');
     const zoomIn = document.getElementById('zoom-in');
     const zoomOut = document.getElementById('zoom-out');
+    const zoomLevel = document.getElementById('zoom-level');
     const prevPage = document.getElementById('prev-page');
     const nextPage = document.getElementById('next-page');
+    const pageInput = document.getElementById('page-input');
+    const goPage = document.getElementById('go-page');
     
     const closeViewer = () => {
       overlay.remove();
@@ -296,65 +293,81 @@ class PDFViewerManager {
     
     closeBtn.onclick = closeViewer;
     
-    // Zoom controls
-    zoomIn.onclick = () => this.adjustZoom(10);
-    zoomOut.onclick = () => this.adjustZoom(-10);
+    // Zoom controls - zooms the iframe content
+    zoomIn.onclick = () => {
+      this.currentZoom = Math.min(3.0, this.currentZoom + 0.1);
+      iframe.style.transform = `scale(${this.currentZoom})`;
+      iframe.style.transformOrigin = '0 0';
+      iframe.style.width = `${100 / this.currentZoom}%`;
+      iframe.style.height = `${100 / this.currentZoom}%`;
+      zoomLevel.textContent = `${Math.round(this.currentZoom * 100)}%`;
+    };
+    
+    zoomOut.onclick = () => {
+      this.currentZoom = Math.max(0.5, this.currentZoom - 0.1);
+      iframe.style.transform = `scale(${this.currentZoom})`;
+      iframe.style.transformOrigin = '0 0';
+      iframe.style.width = `${100 / this.currentZoom}%`;
+      iframe.style.height = `${100 / this.currentZoom}%`;
+      zoomLevel.textContent = `${Math.round(this.currentZoom * 100)}%`;
+    };
     
     // Page navigation
-    prevPage.onclick = () => this.navigatePage(-1);
-    nextPage.onclick = () => this.navigatePage(1);
+    const navigateToPage = (page) => {
+      if (page && page > 0) {
+        this.currentPage = page;
+        const baseUrl = this.ebookUrl.split('#')[0];
+        iframe.src = `${baseUrl}#page=${page}&toolbar=0&navpanes=0&scrollbar=1&view=FitH`;
+      }
+    };
+    
+    prevPage.onclick = () => {
+      this.currentPage = Math.max(1, this.currentPage - 1);
+      navigateToPage(this.currentPage);
+      pageInput.value = this.currentPage;
+    };
+    
+    nextPage.onclick = () => {
+      this.currentPage++;
+      navigateToPage(this.currentPage);
+      pageInput.value = this.currentPage;
+    };
+    
+    goPage.onclick = () => {
+      const page = parseInt(pageInput.value);
+      if (page && page > 0) {
+        navigateToPage(page);
+      }
+    };
+    
+    pageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const page = parseInt(pageInput.value);
+        if (page && page > 0) {
+          navigateToPage(page);
+        }
+      }
+    });
     
     // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      if (!overlay.parentNode) return;
+    document.addEventListener('keydown', function keyHandler(e) {
+      if (!overlay.parentNode) {
+        document.removeEventListener('keydown', keyHandler);
+        return;
+      }
       
       if (e.key === 'Escape') {
         closeViewer();
-      } else if (e.key === '+' || e.key === '=') {
-        this.adjustZoom(10);
-      } else if (e.key === '-') {
-        this.adjustZoom(-10);
       } else if (e.key === 'ArrowLeft') {
-        this.navigatePage(-1);
+        prevPage.click();
       } else if (e.key === 'ArrowRight') {
-        this.navigatePage(1);
+        nextPage.click();
+      } else if (e.key === '+' || e.key === '=') {
+        zoomIn.click();
+      } else if (e.key === '-') {
+        zoomOut.click();
       }
     });
-  }
-  
-  adjustZoom(delta) {
-    this.currentZoom = Math.max(50, Math.min(200, this.currentZoom + delta));
-    const zoomLevel = document.getElementById('zoom-level');
-    if (zoomLevel) {
-      zoomLevel.textContent = `${this.currentZoom}%`;
-    }
-    
-    // Update iframe zoom
-    if (this.iframe) {
-      this.iframe.style.transform = `scale(${this.currentZoom / 100})`;
-      this.iframe.style.transformOrigin = 'top center';
-      if (this.currentZoom > 100) {
-        this.iframe.style.width = `${100 * (100 / this.currentZoom)}%`;
-        this.iframe.style.height = `${100 * (100 / this.currentZoom)}%`;
-      } else {
-        this.iframe.style.width = '100%';
-        this.iframe.style.height = '100%';
-      }
-    }
-  }
-  
-  navigatePage(delta) {
-    this.currentPage = Math.max(1, this.currentPage + delta);
-    const pageInfo = document.getElementById('page-info');
-    if (pageInfo) {
-      pageInfo.textContent = `Page ${this.currentPage}`;
-    }
-    
-    // Update iframe source with page number
-    if (this.iframe) {
-      const baseUrl = this.ebookUrl.split('#')[0];
-      this.iframe.src = `${baseUrl}#page=${this.currentPage}&toolbar=0&navpanes=0&scrollbar=1&view=FitH`;
-    }
   }
 }
 
@@ -611,18 +624,17 @@ class Footer extends PageComponent {
   render() {
     const content = `
       <div class="footer-content">
-        <div class="footer-section">
-          <h4>Contact</h4>
-          <p>Email: <a href="mailto:thebanyantreebook@gmail.com">thebanyantreebook@gmail.com</a></p>
-          <p>LinkedIn: <a href="https://www.linkedin.com/in/sumitgupta1?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank">Sumit Gupta</a></p>
-        </div>
-        <div class="footer-section">
-          <h4>Terms & Conditions</h4>
-          <p><a href="#terms" data-section="terms">View Terms & Conditions</a></p>
+        <div class="footer-section" style="max-width: 600px; margin: 0 auto; text-align: center;">
+          <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+            <a href="#terms" data-section="terms" style="color: #4CAF50; text-decoration: none; font-weight: 500;">Terms & Conditions</a>
+          </p>
+          <p style="font-size: 0.85rem; color: #ccc;">
+            Contact: <a href="mailto:thebanyantreebook@gmail.com" style="color: #4CAF50; text-decoration: none;">thebanyantreebook@gmail.com</a>
+          </p>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; ${new Date().getFullYear()} Academic E-Book Portal. All rights reserved.</p>
+        <p>&copy; ${new Date().getFullYear()} All rights reserved.</p>
       </div>
     `;
     super.render(content);
@@ -654,8 +666,8 @@ class BookCard {
     if (this.posterElement) {
       this.posterElement.innerHTML = `
         <img src="assets/banyan_tree_cover.jpg" 
-             alt="Under the Banyan Tree - ISI Book Number Theory"
-             onerror="this.src='https://via.placeholder.com/360x540/2f5d3f/ffffff?text=ISI+Number+Theory'">
+             alt="Under the Banyan Tree - Decoding Numbers"
+             onerror="this.src='https://via.placeholder.com/360x540/2f5d3f/ffffff?text=Decoding+Numbers'">
       `;
     }
     
@@ -663,7 +675,7 @@ class BookCard {
       this.detailsElement.innerHTML = `
         <div>
           <h2>Under the Banyan Tree
-            <span>ISI Book Number Theory</span>
+            <span>Decoding Numbers</span>
           </h2>
           <div class="meta-data">Author: Sumit Gupta | Pages: 450+ | Subject: Mathematics</div>
           <p>
