@@ -1117,3 +1117,16 @@ body {
     font-size: 28px;
   }
 }
+/* Add this to your styles.css file */
+
+/* Footer email styling - matches green theme */
+.footer-content a[href^="mailto"] {
+  color: #a7d5ba !important; /* Green color matching other links */
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-content a[href^="mailto"]:hover {
+  color: #c1e5d0 !important; /* Lighter green on hover */
+  text-decoration: underline;
+}
