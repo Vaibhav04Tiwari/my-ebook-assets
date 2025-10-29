@@ -221,12 +221,14 @@ class AuthenticationManager {
 
 // ==================== PDF VIEWER MANAGER ====================
 // Replace the PDFViewerManager class in app.js with this fixed version
-// ==================== PDF VIEWER MANAGER ====================
-// Replace your existing PDFViewerManager class with this one
 class PDFViewerManager {
   constructor(ebookUrl) {
     this.ebookUrl = ebookUrl;
+    this.currentPage = 1;
+    this.currentZoom = 100;
+    this.totalPages = 450;
     this.overlay = null;
+    this.iframe = null;
   }
   
   openEmbeddedViewer() {
@@ -244,12 +246,24 @@ class PDFViewerManager {
             <span class="viewer-icon">📖</span>
             <span>Under the Banyan Tree - Decoding Numbers</span>
           </div>
+          <div class="pdf-viewer-controls">
+            <button id="zoom-out-btn" class="pdf-control-btn" title="Zoom Out (-)">−</button>
+            <span id="zoom-level-display" class="zoom-display">100%</span>
+            <button id="zoom-in-btn" class="pdf-control-btn" title="Zoom In (+)">+</button>
+            <span class="control-divider">|</span>
+            <button id="prev-page-btn" class="pdf-control-btn" title="Previous Page (←)">◄</button>
+            <span class="page-info" id="page-info-display">1 / ${this.totalPages}</span>
+            <button id="next-page-btn" class="pdf-control-btn" title="Next Page (→)">►</button>
+            <span class="control-divider">|</span>
+            <input type="number" id="page-number-input" class="page-input" min="1" max="${this.totalPages}" value="1" placeholder="Page">
+            <button id="go-page-btn" class="pdf-control-btn" title="Go to Page">Go</button>
+          </div>
           <button class="pdf-viewer-close" id="close-viewer-btn">&times;</button>
         </div>
         <div class="pdf-viewer-container" id="pdf-container-main">
           <iframe 
             id="pdf-iframe-viewer"
-            src="${this.ebookUrl}" 
+            src="${this.ebookUrl}#page=1&zoom=100" 
             frameborder="0"
             allowfullscreen>
           </iframe>
@@ -261,14 +275,26 @@ class PDFViewerManager {
     document.body.style.overflow = 'hidden';
     
     this.overlay = document.getElementById('pdf-overlay');
-    this.setupControls();
+    this.iframe = document.getElementById('pdf-iframe-viewer');
+    this.pageInfo = document.getElementById('page-info-display');
+    this.pageInput = document.getElementById('page-number-input');
+    this.zoomDisplay = document.getElementById('zoom-level-display');
+    
+    setTimeout(() => {
+      this.setupControls();
+    }, 100);
   }
   
   setupControls() {
     const closeBtn = document.getElementById('close-viewer-btn');
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+    const prevPageBtn = document.getElementById('prev-page-btn');
+    const nextPageBtn = document.getElementById('next-page-btn');
+    const goPageBtn = document.getElementById('go-page-btn');
     
     if (!closeBtn) {
-      console.error('Close button not found');
+      console.error('PDF controls not found');
       return;
     }
     
@@ -277,21 +303,124 @@ class PDFViewerManager {
       document.body.style.overflow = '';
     });
     
-    // Keyboard shortcut for closing
+    zoomInBtn.addEventListener('click', () => {
+      if (this.currentZoom < 200) {
+        this.currentZoom += 25;
+        this.updatePDFView();
+      }
+    });
+    
+    zoomOutBtn.addEventListener('click', () => {
+      if (this.currentZoom > 50) {
+        this.currentZoom -= 25;
+        this.updatePDFView();
+      }
+    });
+    
+    prevPageBtn.addEventListener('click', () => {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+        this.updatePDFView();
+      }
+    });
+    
+    nextPageBtn.addEventListener('click', () => {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+        this.updatePDFView();
+      }
+    });
+    
+    goPageBtn.addEventListener('click', () => {
+      const page = parseInt(this.pageInput.value);
+      if (page && page > 0 && page <= this.totalPages) {
+        this.currentPage = page;
+        this.updatePDFView();
+      }
+    });
+    
+    this.pageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        goPageBtn.click();
+      }
+    });
+    
     const keyHandler = (e) => {
       if (!this.overlay || !this.overlay.parentNode) {
         document.removeEventListener('keydown', keyHandler);
         return;
       }
       
-      if (e.key === 'Escape') {
-        closeBtn.click();
+      if (document.activeElement === this.pageInput) return;
+      
+      switch(e.key) {
+        case 'Escape':
+          closeBtn.click();
+          break;
+        case 'ArrowLeft':
+          prevPageBtn.click();
+          e.preventDefault();
+          break;
+        case 'ArrowRight':
+          nextPageBtn.click();
+          e.preventDefault();
+          break;
+        case '+':
+        case '=':
+          zoomInBtn.click();
+          e.preventDefault();
+          break;
+        case '-':
+          zoomOutBtn.click();
+          e.preventDefault();
+          break;
       }
     };
     
     document.addEventListener('keydown', keyHandler);
   }
+  
+  updatePDFView() {
+    if (!this.iframe) return;
+    
+    const baseUrl = this.ebookUrl.split('#')[0];
+    this.iframe.src = `${baseUrl}#page=${this.currentPage}&zoom=${this.currentZoom}`;
+    
+    if (this.pageInfo) {
+      this.pageInfo.textContent = `${this.currentPage} / ${this.totalPages}`;
+    }
+    
+    if (this.pageInput) {
+      this.pageInput.value = this.currentPage;
+    }
+    
+    if (this.zoomDisplay) {
+      this.zoomDisplay.textContent = `${this.currentZoom}%`;
+    }
+  }
 }
+// ==================== DOWNLOAD MANAGER ====================
+class DownloadManager {
+  constructor(fileConfig) {
+    this.fileConfig = fileConfig;
+  }
+  
+  startDownload() {
+    console.log('Starting file download');
+    
+    const link = document.createElement('a');
+    link.href = this.fileConfig.url;
+    link.download = this.fileConfig.filename;
+    link.target = '_blank';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    console.log('Download initiated');
+  }
+}
+
 // ==================== UI MANAGER ====================
 class UIManager {
   constructor() {
