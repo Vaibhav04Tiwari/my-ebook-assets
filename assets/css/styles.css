@@ -1,910 +1,1371 @@
-// app.js - Object-Oriented Academic Portal with Navigation
+/* Natural Academic Portal Design - Human Touch */
 
-// ==================== CONFIGURATION ====================
-class Config {
-  static AWS = {
-    userPoolId: 'us-east-1_Oeh7iH12H',
-    clientId: '5gfu0h940eejksp0ekuqi1s9lh',
-    cognitoDomain: 'https://us-east-1oeh7ih12h.auth.us-east-1.amazoncognito.com'
-  };
-  
-  static SOLUTION_FILE = {
-    url: './assets/ISI_Book_Number_Theory_Solutions.pdf',
-    filename: 'ISI_Book_Number_Theory_Solutions.pdf'
-  };
-  
-  static EBOOK_FILE = {
-    url: 'https://my-ebook-assets.s3.us-east-1.amazonaws.com/ISI_Book_Number_Theory.pdf'
-  };
-  
-  // Production redirect URI - MUST match exactly what's in Cognito
-  static REDIRECT_URI = 'https://my-ebook-assets.vercel.app';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap');
+
+:root {
+  --primary: #2f5d3f;
+  --primary-hover: #1e3d2a;
+  --secondary: #5a7d67;
+  --bg-main: #f9fafb;
+  --bg-card: #ffffff;
+  --text-dark: #1f2937;
+  --text-medium: #4b5563;
+  --text-light: #6b7280;
+  --border-subtle: #e5e7eb;
+  --border-medium: #d1d5db;
+  --accent-light: #e8f4ed;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
-// ==================== NAVIGATION MANAGER ====================
-class NavigationManager {
-  constructor() {
-    this.sections = {
-      'home': document.getElementById('main-book'),
-      'author': document.getElementById('author-section'),
-      'solutions': document.getElementById('solutions-section'),
-      'terms': document.getElementById('terms-section')
-    };
-    this.heroSection = document.getElementById('home-section');
-    this.currentSection = 'home';
-  }
-  
-  init() {
-    // Setup navigation links
-    this.setupNavLinks();
-    this.setupFooterLinks();
-    
-    // Show home section by default
-    this.showSection('home');
-  }
-  
-  setupNavLinks() {
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const section = link.getAttribute('data-section');
-        if (section) {
-          this.showSection(section);
-          this.updateActiveLink(navLinks, link);
-          
-          // Smooth scroll to top
-          window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-          });
-        }
-      });
-    });
-  }
-  
-  setupFooterLinks() {
-    const footerLinks = document.querySelectorAll('.footer-section a[data-section]');
-    footerLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const section = link.getAttribute('data-section');
-        if (section) {
-          this.showSection(section);
-          
-          // Update header nav links
-          const navLinks = document.querySelectorAll('.nav-link');
-          navLinks.forEach(navLink => {
-            if (navLink.getAttribute('data-section') === section) {
-              this.updateActiveLink(navLinks, navLink);
-            }
-          });
-          
-          // Smooth scroll to top
-          window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-          });
-        }
-      });
-    });
-  }
-  
-  showSection(sectionName) {
-    // Hide all sections
-    Object.values(this.sections).forEach(section => {
-      if (section) {
-        section.style.display = 'none';
-        section.classList.remove('active');
-      }
-    });
-    
-    // Show/hide hero section
-    if (this.heroSection) {
-      this.heroSection.style.display = sectionName === 'home' ? 'block' : 'none';
-    }
-    
-    // Show selected section
-    if (sectionName === 'home') {
-      if (this.sections.home) {
-        this.sections.home.style.display = 'flex';
-      }
-    } else {
-      if (this.sections[sectionName]) {
-        this.sections[sectionName].style.display = 'block';
-        this.sections[sectionName].classList.add('active');
-      }
-    }
-    
-    this.currentSection = sectionName;
-  }
-  
-  updateActiveLink(links, activeLink) {
-    links.forEach(link => link.classList.remove('active'));
-    activeLink.classList.add('active');
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-// ==================== AUTHENTICATION MANAGER ====================
-class AuthenticationManager {
-  constructor(config) {
-    this.config = config;
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-dark);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.site-header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--text-dark);
+  cursor: pointer;
+}
+
+.logo-icon {
+  font-size: 1.5rem;
+  filter: grayscale(20%);
+}
+
+.logo-text {
+  font-weight: 600;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+.main-nav {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-link {
+  color: var(--text-medium);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  color: var(--primary);
+}
+
+.nav-link.active {
+  color: var(--primary);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary);
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    width: 0;
+    left: 50%;
   }
-  
-  isAuthenticated() {
-    return !!localStorage.getItem('accessToken');
-  }
-  
-  redirectToGoogleSignIn() {
-    // Get the base URL - use root domain without trailing slash
-    let currentUrl = window.location.origin;
-    
-    // If on a specific page (not root), include the path
-    const path = window.location.pathname;
-    if (path && path !== '/' && path !== '/index.html') {
-      currentUrl += path;
-    }
-    
-    const authUrl = `${this.config.cognitoDomain}/oauth2/authorize?` +
-      `identity_provider=Google&` +
-      `redirect_uri=${encodeURIComponent(currentUrl)}&` +
-      `response_type=code&` +
-      `client_id=${this.config.clientId}&` +
-      `scope=openid%20email%20profile`;
-    
-    console.log('Redirect URI:', currentUrl);
-    console.log('Full Auth URL:', authUrl);
-    window.location.href = authUrl;
-  }
-  
-  async handleCallback() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    
-    if (!code) return false;
-    
-    console.log('Processing OAuth callback');
-    return await this.exchangeCodeForTokens(code);
-  }
-  
-  async exchangeCodeForTokens(code) {
-    // Use same format as authorization
-    let redirectUri = window.location.origin;
-    
-    const path = window.location.pathname;
-    if (path && path !== '/' && path !== '/index.html') {
-      redirectUri += path;
-    }
-    
-    try {
-      const response = await fetch(`${this.config.cognitoDomain}/oauth2/token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          client_id: this.config.clientId,
-          code: code,
-          redirect_uri: redirectUri
-        })
-      });
-      
-      const tokens = await response.json();
-      
-      if (tokens.access_token) {
-        localStorage.setItem('accessToken', tokens.access_token);
-        localStorage.setItem('idToken', tokens.id_token);
-        
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        console.log('Authentication successful');
-        return true;
-      }
-      
-      console.error('Token exchange failed:', tokens);
-      return false;
-      
-    } catch (error) {
-      console.error('Authentication error:', error);
-      return false;
-    }
-  }
-  
-  signOut() {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('idToken');
-    localStorage.removeItem('downloadIntent');
-    console.log('User signed out');
+  to {
+    width: 100%;
+    left: 0;
   }
 }
 
-// ==================== PDF VIEWER MANAGER ====================
-// Replace the PDFViewerManager class in app.js with this fixed version
-// ==================== PDF VIEWER MANAGER ====================
-// Replace your existing PDFViewerManager class with this one
-
-class PDFViewerManager {
-  constructor(ebookUrl) {
-    this.ebookUrl = ebookUrl;
-    this.currentPage = 1;
-    this.currentZoom = 100;
-    this.totalPages = 450; // Update this to your actual page count
-    this.overlay = null;
-    this.iframe = null;
-  }
-  
-  openEmbeddedViewer() {
-    if (!this.ebookUrl) {
-      alert('E-Book URL not configured. Please add your PDF URL.');
-      return;
-    }
-    
-    console.log('Opening E-Book in embedded viewer');
-    
-    const viewerHTML = `
-      <div class="pdf-viewer-overlay" id="pdf-overlay">
-        <div class="pdf-viewer-header">
-          <div class="pdf-viewer-title">
-            <span class="viewer-icon">📖</span>
-            <span>Under the Banyan Tree - Decoding Numbers</span>
-          </div>
-          <div class="pdf-viewer-controls">
-            <button id="zoom-out-btn" class="pdf-control-btn" title="Zoom Out (-)">
-              <span style="font-size: 20px; line-height: 1;">−</span>
-            </button>
-            <span id="zoom-level-display" class="zoom-display">100%</span>
-            <button id="zoom-in-btn" class="pdf-control-btn" title="Zoom In (+)">
-              <span style="font-size: 20px; line-height: 1;">+</span>
-            </button>
-            <span class="control-divider">|</span>
-            <button id="prev-page-btn" class="pdf-control-btn" title="Previous Page (←)">
-              <span>◄</span>
-            </button>
-            <span class="page-info" id="page-info-display">1 / ${this.totalPages}</span>
-            <button id="next-page-btn" class="pdf-control-btn" title="Next Page (→)">
-              <span>►</span>
-            </button>
-            <span class="control-divider">|</span>
-            <input type="number" id="page-number-input" class="page-input" min="1" max="${this.totalPages}" value="1">
-            <button id="go-page-btn" class="pdf-control-btn" title="Go to Page">Go</button>
-          </div>
-          <button class="pdf-viewer-close" id="close-viewer-btn">&times;</button>
-        </div>
-        <div class="pdf-viewer-container" id="pdf-container-main">
-          <iframe 
-            id="pdf-iframe-viewer"
-            src="${this.ebookUrl}#page=1&zoom=100&toolbar=0&navpanes=0" 
-            frameborder="0"
-            allowfullscreen>
-          </iframe>
-        </div>
-      </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', viewerHTML);
-    document.body.style.overflow = 'hidden';
-    
-    // Get references
-    this.overlay = document.getElementById('pdf-overlay');
-    this.iframe = document.getElementById('pdf-iframe-viewer');
-    this.zoomDisplay = document.getElementById('zoom-level-display');
-    this.pageInfo = document.getElementById('page-info-display');
-    this.pageInput = document.getElementById('page-number-input');
-    
-    // Setup controls after a small delay to ensure elements are ready
-    setTimeout(() => {
-      this.setupControls();
-    }, 100);
-  }
-  
-  setupControls() {
-    const closeBtn = document.getElementById('close-viewer-btn');
-    const zoomInBtn = document.getElementById('zoom-in-btn');
-    const zoomOutBtn = document.getElementById('zoom-out-btn');
-    const prevPageBtn = document.getElementById('prev-page-btn');
-    const nextPageBtn = document.getElementById('next-page-btn');
-    const goPageBtn = document.getElementById('go-page-btn');
-    
-    if (!closeBtn || !zoomInBtn) {
-      console.error('PDF controls not found');
-      return;
-    }
-    
-    // Close viewer
-    closeBtn.addEventListener('click', () => {
-      this.overlay.remove();
-      document.body.style.overflow = '';
-    });
-    
-    // Zoom In
-    zoomInBtn.addEventListener('click', () => {
-      if (this.currentZoom < 200) {
-        this.currentZoom += 25;
-        this.updatePDFView();
-        console.log('Zoom in:', this.currentZoom);
-      }
-    });
-    
-    // Zoom Out
-    zoomOutBtn.addEventListener('click', () => {
-      if (this.currentZoom > 50) {
-        this.currentZoom -= 25;
-        this.updatePDFView();
-        console.log('Zoom out:', this.currentZoom);
-      }
-    });
-    
-    // Previous Page
-    prevPageBtn.addEventListener('click', () => {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-        this.updatePDFView();
-        console.log('Previous page:', this.currentPage);
-      }
-    });
-    
-    // Next Page
-    nextPageBtn.addEventListener('click', () => {
-      if (this.currentPage < this.totalPages) {
-        this.currentPage++;
-        this.updatePDFView();
-        console.log('Next page:', this.currentPage);
-      }
-    });
-    
-    // Go to Page
-    goPageBtn.addEventListener('click', () => {
-      const page = parseInt(this.pageInput.value);
-      if (page && page > 0 && page <= this.totalPages) {
-        this.currentPage = page;
-        this.updatePDFView();
-        console.log('Go to page:', page);
-      }
-    });
-    
-    // Enter key on page input
-    this.pageInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        goPageBtn.click();
-      }
-    });
-    
-    // Keyboard shortcuts
-    const keyHandler = (e) => {
-      if (!this.overlay || !this.overlay.parentNode) {
-        document.removeEventListener('keydown', keyHandler);
-        return;
-      }
-      
-      // Don't trigger if user is typing in input
-      if (document.activeElement === this.pageInput) return;
-      
-      switch(e.key) {
-        case 'Escape':
-          closeBtn.click();
-          break;
-        case 'ArrowLeft':
-          prevPageBtn.click();
-          e.preventDefault();
-          break;
-        case 'ArrowRight':
-          nextPageBtn.click();
-          e.preventDefault();
-          break;
-        case '+':
-        case '=':
-          zoomInBtn.click();
-          e.preventDefault();
-          break;
-        case '-':
-          zoomOutBtn.click();
-          e.preventDefault();
-          break;
-      }
-    };
-    
-    document.addEventListener('keydown', keyHandler);
-  }
-  
-  updatePDFView() {
-    if (!this.iframe) {
-      console.error('PDF iframe not found');
-      return;
-    }
-    
-    // Update URL with new page and zoom
-    const baseUrl = this.ebookUrl.split('#')[0];
-    const newUrl = `${baseUrl}#page=${this.currentPage}&zoom=${this.currentZoom}&toolbar=0&navpanes=0`;
-    
-    // Update iframe
-    this.iframe.src = newUrl;
-    
-    // Update display
-    if (this.zoomDisplay) {
-      this.zoomDisplay.textContent = `${this.currentZoom}%`;
-    }
-    
-    if (this.pageInfo) {
-      this.pageInfo.textContent = `${this.currentPage} / ${this.totalPages}`;
-    }
-    
-    if (this.pageInput) {
-      this.pageInput.value = this.currentPage;
-    }
-    
-    // Apply CSS transform for visual zoom
-    const scale = this.currentZoom / 100;
-    this.iframe.style.transform = `scale(${scale})`;
-    this.iframe.style.transformOrigin = 'center top';
-    
-    console.log(`Updated PDF - Page: ${this.currentPage}, Zoom: ${this.currentZoom}%`);
-  }
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(to bottom, var(--accent-light), var(--bg-main));
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border-subtle);
 }
-// ==================== DOWNLOAD MANAGER ====================
-class DownloadManager {
-  constructor(fileConfig) {
-    this.fileConfig = fileConfig;
+
+.hero-title {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  color: var(--text-medium);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* Main Card */
+.card-main {
+  max-width: 1200px;
+  margin: 2.5rem auto;
+  padding: 0 2rem;
+  display: flex;
+  gap: 0;
+}
+
+.card-wrapper {
+  width: 100%;
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  display: flex;
+  transition: box-shadow 0.3s ease;
+}
+
+.card-wrapper:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-media {
+  flex: 0 0 360px;
+  background: linear-gradient(135deg, #f5f7f6 0%, #e8ede9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border-right: 1px solid var(--border-subtle);
+}
+
+.card-media img {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-media img:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.card-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.5rem;
+}
+
+.card-details h2 {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+}
+
+.card-details h2 span {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--secondary);
+  font-weight: 600;
+  margin-top: 0.5rem;
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.meta-data {
+  margin: 1rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--accent-light);
+  border-left: 3px solid var(--primary);
+  color: var(--text-medium);
+  font-size: 0.88rem;
+  border-radius: 0 4px 4px 0;
+  font-weight: 500;
+}
+
+.card-details > div:first-child p {
+  font-size: 0.98rem;
+  line-height: 1.75;
+  color: var(--text-medium);
+  margin-bottom: 0;
+}
+
+/* Content Sections */
+.content-section {
+  max-width: 1100px;
+  margin: 0 auto 2.5rem;
+  padding: 0 2rem;
+  display: none;
+}
+
+.content-section.active {
+  display: block;
+  animation: fadeInUp 0.4s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  startDownload() {
-    console.log('Starting file download');
-    
-    const link = document.createElement('a');
-    link.href = this.fileConfig.url;
-    link.download = this.fileConfig.filename;
-    link.target = '_blank';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    console.log('Download initiated');
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-// ==================== UI MANAGER ====================
-class UIManager {
-  constructor() {
-    this.modals = [];
+.section-card {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.section-title {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 1.75rem;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.section-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-dark);
+  margin: 1.5rem 0 0.75rem;
+  font-weight: 600;
+}
+
+.section-card p {
+  color: var(--text-medium);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.section-card ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.section-card li {
+  color: var(--text-medium);
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-medium);
+}
+
+.contact-item a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.contact-item a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.contact-icon {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+/* Buttons */
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.5s, height 0.5s;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.btn--primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn--primary:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn--primary:active {
+  transform: translateY(0);
+}
+
+.btn--secondary {
+  background: white;
+  color: var(--primary);
+  border: 2px solid var(--border-medium);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn--secondary:hover {
+  background: var(--accent-light);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* Footer */
+.site-footer {
+  background: #2a3f35;
+  color: #d1d5db;
+  margin-top: 4rem;
+  padding: 3rem 2rem 1.5rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-section h4 {
+  margin-bottom: 1rem;
+  color: #a7d5ba;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.footer-section p,
+.footer-section a {
+  color: #9ca3af;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-section a:hover {
+  color: #a7d5ba;
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section li {
+  margin-bottom: 0.6rem;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(167, 213, 186, 0.15);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+.social-links a:hover {
+  background: rgba(167, 213, 186, 0.25);
+  transform: translateY(-2px);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 1.5rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+/* Success Notification */
+.success-notification {
+  position: fixed;
+  top: 90px;
+  right: 20px;
+  background: white;
+  padding: 1rem 1.3rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  border-left: 4px solid #10b981;
+  z-index: 1000;
+  display: none;
+}
+
+.success-notification.show {
+  display: block;
+  animation: slideInRight 0.3s ease;
+}
+
+.success-notification.fade-out {
+  animation: slideOutRight 0.3s ease forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
   }
-  
-  showLoadingModal() {
-    const modal = new LoadingModal();
-    modal.show();
-    this.modals.push(modal);
-    return modal;
-  }
-  
-  showSuccessNotification(title, message) {
-    const notification = new SuccessNotification(title, message);
-    notification.show();
-  }
-  
-  showGoogleSignInModal(onSignInClick) {
-    const modal = new GoogleSignInModal(onSignInClick);
-    modal.show();
-    this.modals.push(modal);
-    return modal;
-  }
-  
-  showErrorModal(message) {
-    const modal = new ErrorModal(message);
-    modal.show();
-    this.modals.push(modal);
-    return modal;
-  }
-  
-  removeAllModals() {
-    this.modals.forEach(modal => modal.remove());
-    this.modals = [];
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
-// ==================== MODAL CLASSES ====================
-class Modal {
-  constructor() {
-    this.element = null;
-  }
-  
-  create(content, className = '') {
-    this.element = document.createElement('div');
-    this.element.className = `auth-modal ${className}`;
-    this.element.innerHTML = content;
-    document.body.appendChild(this.element);
-    return this.element;
-  }
-  
-  show() {
-    if (this.element) {
-      this.element.style.display = 'block';
-    }
-  }
-  
-  remove() {
-    if (this.element && this.element.parentNode) {
-      this.element.parentNode.removeChild(this.element);
-    }
+@keyframes slideOutRight {
+  to {
+    opacity: 0;
+    transform: translateX(400px);
   }
 }
 
-class LoadingModal extends Modal {
-  constructor() {
-    super();
-    const content = `
-      <div class="auth-modal-content loading-content">
-        <div class="loading-spinner"></div>
-        <h3>Authenticating...</h3>
-        <p>Verifying your credentials</p>
-      </div>
-    `;
-    this.create(content);
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.notification-icon {
+  font-size: 1.5rem;
+  color: #10b981;
+}
+
+.notification-text h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.2rem;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.notification-text p {
+  font-size: 0.85rem;
+  color: var(--text-medium);
+}
+
+/* PDF Viewer Overlay - Complete Rewrite */
+.pdf-viewer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.2s ease;
+}
+
+.pdf-viewer-header {
+  background: #2c3e35;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.pdf-viewer-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.viewer-icon {
+  font-size: 1.3rem;
+}
+
+.pdf-viewer-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.pdf-control-btn {
+  background: #3d5e47;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-width: 38px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.pdf-control-btn:hover {
+  background: #4a7356;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.pdf-control-btn:active {
+  transform: translateY(0);
+  background: #2f4a3a;
+}
+
+.zoom-display {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 50px;
+  text-align: center;
+  padding: 0 6px;
+  user-select: none;
+}
+
+.page-input {
+  width: 65px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  height: 34px;
+}
+
+.page-input:focus {
+  outline: none;
+  border-color: #4a7356;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.page-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Remove number input arrows */
+.page-input::-webkit-inner-spin-button,
+.page-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.page-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.control-divider {
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 4px;
+  font-size: 16px;
+  user-select: none;
+}
+
+.pdf-viewer-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.8rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.pdf-viewer-close:hover {
+  background: rgba(255, 77, 77, 0.8);
+  border-color: rgba(255, 77, 77, 0.9);
+}
+
+.pdf-viewer-container {
+  flex: 1;
+  background: #1a1a1a;
+  position: relative;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+}
+
+.pdf-viewer-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+  display: block;
+}
+
+/* Responsive PDF Viewer */
+@media (max-width: 768px) {
+  .pdf-viewer-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0.8rem 1rem;
+  }
+  
+  .pdf-viewer-title {
+    font-size: 0.85rem;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .pdf-viewer-controls {
+    width: calc(100% - 50px);
+    justify-content: center;
+    gap: 6px;
+  }
+  
+  .pdf-control-btn {
+    padding: 5px 10px;
+    font-size: 13px;
+    min-width: 32px;
+    height: 30px;
+  }
+  
+  .page-input {
+    width: 55px;
+    height: 30px;
+    font-size: 13px;
+  }
+  
+  .zoom-display {
+    font-size: 12px;
+    min-width: 45px;
+  }
+  
+  .pdf-viewer-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 1.5rem;
   }
 }
 
-class ErrorModal extends Modal {
-  constructor(message) {
-    super();
-    const content = `
-      <div class="auth-modal-content error-content">
-        <span class="modal-close">&times;</span>
-        <div class="error-icon">⚠️</div>
-        <h3>Error</h3>
-        <p>${message}</p>
-        <button class="btn btn--primary">OK</button>
-      </div>
-    `;
-    this.create(content);
-    this.attachListeners();
+/* Responsive */
+@media (max-width: 900px) {
+  .card-main {
+    flex-direction: column;
+    padding: 0 1.5rem;
   }
-  
-  attachListeners() {
-    const closeBtn = this.element.querySelector('.modal-close');
-    const okBtn = this.element.querySelector('.btn');
-    
-    closeBtn.onclick = () => this.remove();
-    okBtn.onclick = () => this.remove();
-    this.element.onclick = (e) => {
-      if (e.target === this.element) this.remove();
-    };
+
+  .card-media {
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .main-nav {
+    gap: 1.5rem;
   }
 }
 
-class SuccessNotification {
-  constructor(title, message) {
-    this.title = title;
-    this.message = message;
-    this.element = null;
+@media (max-width: 600px) {
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
   }
-  
-  show() {
-    this.element = document.createElement('div');
-    this.element.className = 'success-notification show';
-    this.element.innerHTML = `
-      <div class="notification-content">
-        <span class="notification-icon">✓</span>
-        <div class="notification-text">
-          <h4>${this.title}</h4>
-          <p>${this.message}</p>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(this.element);
-    
-    setTimeout(() => {
-      this.element.classList.add('fade-out');
-      setTimeout(() => this.remove(), 300);
-    }, 4000);
+
+  .main-nav {
+    gap: 1.2rem;
   }
-  
-  remove() {
-    if (this.element && this.element.parentNode) {
-      this.element.parentNode.removeChild(this.element);
-    }
+
+  .hero-title {
+    font-size: 1.5rem;
+  }
+
+  .card-details h2 {
+    font-size: 1.5rem;
+  }
+
+  .success-notification {
+    right: 10px;
+    left: 10px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+  }
+}
+/* ----- Mobile Fixes (Improved) ----- */
+@media (max-width: 600px) {
+  .header-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0.8rem 1rem;
+  }
+
+  .main-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .nav-link {
+    font-size: 0.9rem;
+    padding: 0.3rem 0;
+  }
+
+  .hero-section {
+    padding: 1.2rem 1rem;
+  }
+
+  .card-main {
+    padding: 0 1rem;
+  }
+
+  .card-wrapper {
+    flex-direction: column;
+  }
+
+  .card-media {
+    flex: unset;
+    padding: 1.2rem;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .card-details {
+    padding: 1.5rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+.logo {
+  display: none;
+}
+/* Auth Modal Styles */
+.auth-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+.auth-modal-content {
+  background-color: #ffffff;
+  margin: 10% auto;
+  padding: 50px 40px;
+  border: none;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideDown 0.4s ease;
+  position: relative;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-class GoogleSignInModal extends Modal {
-  constructor(onSignInClick) {
-    super();
-    this.onSignInClick = onSignInClick;
-    const content = `
-      <div class="auth-modal-content">
-        <span class="modal-close">&times;</span>
-        <h2>Sign In to Access E-Book</h2>
-        <p>Please sign in with Google to read the textbook</p>
-        
-        <div class="auth-buttons">
-          <button id="google-signin-btn" class="google-btn">
-            <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-            </svg>
-            <span>Sign in with Google</span>
-          </button>
-        </div>
-        
-        <div id="auth-status" class="auth-status"></div>
-      </div>
-    `;
-    this.create(content);
-    this.attachListeners();
-  }
-  
-  attachListeners() {
-    const closeBtn = this.element.querySelector('.modal-close');
-    const googleBtn = this.element.querySelector('#google-signin-btn');
-    
-    closeBtn.onclick = () => this.remove();
-    googleBtn.onclick = () => {
-      if (this.onSignInClick) {
-        this.onSignInClick();
-      }
-    };
-    
-    this.element.onclick = (e) => {
-      if (e.target === this.element) this.remove();
-    };
-  }
+.auth-modal-content h2 {
+  color: #86b097;
+  margin-bottom: 15px;
+  font-size: 28px;
+  text-align: center;
+  font-weight: 700;
 }
 
-// ==================== PAGE COMPONENT ====================
-class PageComponent {
-  constructor(elementId) {
-    this.element = document.getElementById(elementId);
-  }
-  
-  render(content) {
-    if (this.element) {
-      this.element.innerHTML = content;
-    }
-  }
+.auth-modal-content h3 {
+  color: #2f5d3f;
+  margin-bottom: 10px;
+  font-size: 24px;
+  text-align: center;
+  font-weight: 700;
 }
 
-class Header extends PageComponent {
-  constructor() {
-    super('site-header');
-  }
-  
-  render() {
-    const content = `
-      <div class="header-content">
-        <a href="#home" class="logo" data-section="home">
-          <span class="logo-icon">📚</span>
-          <span class="logo-text">Academic Portal</span>
-        </a>
-        <nav class="main-nav">
-          <a href="#home" class="nav-link active" data-section="home">Home</a>
-          <a href="#author" class="nav-link" data-section="author">Author</a>
-          <a href="#solutions" class="nav-link" data-section="solutions">Solution Book</a>
-        </nav>
-      </div>
-    `;
-    super.render(content);
-  }
+.auth-modal-content p {
+  color: #79838b;
+  margin-bottom: 35px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-class Footer extends PageComponent {
-  constructor() {
-    super('site-footer');
-  }
-  
-  render() {
-    const content = `
-      <div class="footer-content">
-        <div class="footer-section" style="max-width: 600px; margin: 0 auto; text-align: center;">
-          <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">
-            <a href="#terms" data-section="terms" style="color: #4CAF50; text-decoration: none; font-weight: 500;">Terms & Conditions</a>
-          </p>
-          <p style="font-size: 0.85rem; color: #ccc;">
-            Contact: <a href="mailto:thebanyantreebook@gmail.com" style="color: #4CAF50; text-decoration: none;">thebanyantreebook@gmail.com</a>
-          </p>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; ${new Date().getFullYear()} All rights reserved.</p>
-      </div>
-    `;
-    super.render(content);
-  }
+.modal-close {
+  color: #a39baa;
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 32px;
+  font-weight: 300;
+  cursor: pointer;
+  line-height: 20px;
+  transition: color 0.3s ease;
+  background: none;
+  border: none;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-class BookCard {
-  constructor(posterElement, detailsElement) {
-    this.posterElement = posterElement;
-    this.detailsElement = detailsElement;
-  }
-  
-  render() {
-    // Wrap both elements in a card wrapper
-    const cardMain = document.querySelector('.card-main');
-    if (cardMain) {
-      cardMain.innerHTML = `
-        <div class="card-wrapper">
-          <div id="poster-area" class="card-media"></div>
-          <div id="details-area" class="card-details"></div>
-        </div>
-      `;
-      
-      // Re-get elements after creating wrapper
-      this.posterElement = document.getElementById('poster-area');
-      this.detailsElement = document.getElementById('details-area');
-    }
-    
-    if (this.posterElement) {
-      this.posterElement.innerHTML = `
-        <img src="assets/banyan_tree_cover.jpg" 
-             alt="Under the Banyan Tree - Decoding Numbers"
-             onerror="this.src='https://via.placeholder.com/360x540/2f5d3f/ffffff?text=Decoding+Numbers'">
-      `;
-    }
-    
-    if (this.detailsElement) {
-      this.detailsElement.innerHTML = `
-        <div>
-          <h2>Under the Banyan Tree
-            <span>Decoding Numbers</span>
-          </h2>
-          <div class="meta-data">Author: Sumit Gupta | Pages: 450+ | Subject: Mathematics</div>
-          <p>
-            This comprehensive textbook provides an in-depth exploration of number theory concepts, 
-            specifically designed for ISI entrance examination preparation. It covers fundamental 
-            principles, advanced problem-solving techniques, and includes detailed solutions to help 
-            students master complex mathematical concepts.
-          </p>
-        </div>
-        <div class="actions">
-          <button id="access-ebook-btn" class="btn btn--secondary">
-            <span class="btn-icon">📖</span>
-            <span>Access E-Book</span>
-          </button>
-          <button id="solutions-btn" class="btn btn--primary">
-            <span class="btn-icon">📥</span>
-            <span>Solutions</span>
-          </button>
-        </div>
-      `;
-    }
-  }
+.modal-close:hover,
+.modal-close:focus {
+  color: #86b097;
 }
 
-// ==================== MAIN APPLICATION ====================
-class AcademicPortalApp {
-  constructor() {
-    this.authManager = new AuthenticationManager(Config.AWS);
-    this.downloadManager = new DownloadManager(Config.SOLUTION_FILE);
-    this.pdfViewerManager = new PDFViewerManager(Config.EBOOK_FILE.url);
-    this.uiManager = new UIManager();
-    this.navigationManager = new NavigationManager();
-    this.downloadIntent = false;
-  }
-  
-  async init() {
-    console.log('Initializing Academic Portal');
-    
-    // Render UI components
-    this.renderComponents();
-    
-    // Initialize navigation
-    this.navigationManager.init();
-    
-    // Handle OAuth callback
-    const authSuccess = await this.authManager.handleCallback();
-    
-    if (authSuccess) {
-      this.uiManager.removeAllModals();
-      
-      // Check if user intended to access ebook
-      const downloadIntent = localStorage.getItem('downloadIntent');
-      if (downloadIntent === 'ebook') {
-        localStorage.removeItem('downloadIntent');
-        this.openEbookViewer();
-      } else if (downloadIntent === 'solutions') {
-        // Legacy support if any
-        localStorage.removeItem('downloadIntent');
-        this.handleSuccessfulDownload();
-      }
-    }
-    
-    // Setup event listeners
-    this.setupEventListeners();
-    
-    console.log('Academic Portal Ready');
-  }
-  
-  renderComponents() {
-    const header = new Header();
-    header.render();
-    
-    const footer = new Footer();
-    footer.render();
-    
-    const bookCard = new BookCard(
-      document.getElementById('poster-area'),
-      document.getElementById('details-area')
-    );
-    bookCard.render();
-  }
-  
-  setupEventListeners() {
-    setTimeout(() => {
-      const accessBtn = document.getElementById('access-ebook-btn');
-      const solutionsBtn = document.getElementById('solutions-btn');
-      const solutionsBtn2 = document.getElementById('solutions-btn-2');
-      
-      if (accessBtn) {
-        accessBtn.addEventListener('click', () => this.handleAccessEbook());
-      }
-      
-      if (solutionsBtn) {
-        solutionsBtn.addEventListener('click', () => this.handleSolutionsClick());
-      }
-      
-      if (solutionsBtn2) {
-        solutionsBtn2.addEventListener('click', () => this.handleSolutionsClick());
-      }
-      
-      // Logo click handler
-      const logo = document.querySelector('.logo');
-      if (logo) {
-        logo.addEventListener('click', (e) => {
-          e.preventDefault();
-          this.navigationManager.showSection('home');
-          const navLinks = document.querySelectorAll('.nav-link');
-          navLinks.forEach(link => {
-            if (link.getAttribute('data-section') === 'home') {
-              this.navigationManager.updateActiveLink(navLinks, link);
-            }
-          });
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      }
-    }, 300);
-  }
-  
-  handleAccessEbook() {
-    console.log('Access E-Book clicked - Checking authentication');
-    
-    if (this.authManager.isAuthenticated()) {
-      // User is authenticated - open ebook immediately
-      this.openEbookViewer();
-    } else {
-      // Show Google Sign-In modal
-      this.uiManager.showGoogleSignInModal(() => {
-        // Store intent and redirect to Google
-        localStorage.setItem('downloadIntent', 'ebook');
-        this.authManager.redirectToGoogleSignIn();
-      });
-    }
-  }
-  
-  openEbookViewer() {
-    console.log('Opening E-Book in embedded viewer');
-    this.pdfViewerManager.openEmbeddedViewer();
-  }
-  
-  handleSolutionsClick() {
-    console.log('Solutions button clicked - Direct download');
-    // Direct download without authentication
-    this.handleSuccessfulDownload();
-  }
-  
-  handleSuccessfulDownload() {
-    this.uiManager.showSuccessNotification(
-      'Download Started!',
-      'Your solution file is downloading now'
-    );
-    
-    setTimeout(() => {
-      this.downloadManager.startDownload();
-    }, 500);
-  }
+.auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 30px;
 }
 
-// ==================== APPLICATION ENTRY POINT ====================
-document.addEventListener('DOMContentLoaded', () => {
-  const app = new AcademicPortalApp();
-  app.init();
-});
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background-color: #ffffff;
+  color: #3a4750;
+  border: 2px solid #e8ebe8;
+  padding: 16px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.google-btn:hover {
+  background-color: #f8fbf8;
+  border-color: #86b097;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(134, 176, 151, 0.2);
+}
+
+.google-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(134, 176, 151, 0.15);
+}
+
+.auth-status {
+  margin-top: 25px;
+  text-align: center;
+  min-height: 30px;
+}
+
+.auth-status p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Loading Modal */
+.loading-content {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #86b097;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error Modal */
+.error-content {
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.error-content .btn {
+  margin-top: 1.5rem;
+  padding: 0.75rem 2rem;
+  background: #2f5d3f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.error-content .btn:hover {
+  background: #1e3d2a;
+  transform: translateY(-2px);
+}
+
+/* Download Section */
+.download-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 35px;
+}
+
+.download-btn {
+  background: linear-gradient(135deg, #86b097, #9ac4ab);
+  color: #03221a;
+  border: none;
+  padding: 18px 32px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 4px 15px rgba(134, 176, 151, 0.25);
+}
+
+.download-btn:hover {
+  background: linear-gradient(135deg, #9ac4ab, #aed4bc);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(134, 176, 151, 0.35);
+}
+
+.download-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(134, 176, 151, 0.25);
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .auth-modal-content {
+    width: 95%;
+    padding: 40px 25px;
+    margin: 20% auto;
+  }
+  
+  .auth-modal-content h2 {
+    font-size: 24px;
+  }
+  
+  .auth-modal-content h3 {
+    font-size: 20px;
+  }
+  
+  .google-btn {
+    font-size: 15px;
+    padding: 14px 22px;
+  }
+  
+  .download-btn {
+    font-size: 15px;
+    padding: 15px 26px;
+  }
+  
+  .modal-close {
+    top: 15px;
+    right: 15px;
+    font-size: 28px;
+  }
+}
+/* ========================================
+   UPDATED PDF VIEWER CSS
+   Add/Replace these rules in your styles.css
+   ======================================== */
+
+/* Email color fix */
+.footer-content a[href^="mailto"],
+.section-card a[href^="mailto"] {
+  color: #a7d5ba !important;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-content a[href^="mailto"]:hover,
+.section-card a[href^="mailto"]:hover {
+  color: #c1e5d0 !important;
+  text-decoration: underline;
+}
+
+/* PDF Viewer Overlay - Fixed */
+.pdf-viewer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.2s ease;
+}
+
+.pdf-viewer-header {
+  background: #2c3e35;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.pdf-viewer-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.viewer-icon {
+  font-size: 1.3rem;
+}
+
+.pdf-viewer-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.pdf-control-btn {
+  background: #3d5e47;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-width: 38px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.pdf-control-btn:hover:not(:disabled) {
+  background: #4a7356;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.pdf-control-btn:active:not(:disabled) {
+  transform: translateY(0);
+  background: #2f4a3a;
+}
+
+.pdf-control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.zoom-display {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 50px;
+  text-align: center;
+  padding: 0 6px;
+  user-select: none;
+}
+
+.page-info {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: center;
+  padding: 0 8px;
+  user-select: none;
+}
+
+.page-input {
+  width: 65px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  height: 34px;
+}
+
+.page-input:focus {
+  outline: none;
+  border-color: #4a7356;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.page-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Remove number input arrows */
+.page-input::-webkit-inner-spin-button,
+.page-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.page-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.control-divider {
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 4px;
+  font-size: 16px;
+  user-select: none;
+}
+
+.pdf-viewer-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.8rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.pdf-viewer-close:hover {
+  background: rgba(255, 77, 77, 0.8);
+  border-color: rgba(255, 77, 77, 0.9);
+}
+
+/* PDF Container - CRITICAL: No transform applied */
+.pdf-viewer-container {
+  flex: 1;
+  background: #1a1a1a;
+  position: relative;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+}
+
+.pdf-viewer-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+  display: block;
+  /* DO NOT add transform here - let PDF handle its own zoom */
+}
+
+/* Responsive PDF Viewer */
+@media (max-width: 768px) {
+  .pdf-viewer-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0.8rem 1rem;
+  }
+  
+  .pdf-viewer-title {
+    font-size: 0.85rem;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .pdf-viewer-controls {
+    width: calc(100% - 50px);
+    justify-content: center;
+    gap: 6px;
+  }
+  
+  .pdf-control-btn {
+    padding: 5px 10px;
+    font-size: 13px;
+    min-width: 32px;
+    height: 30px;
+  }
+  
+  .page-input {
+    width: 55px;
+    height: 30px;
+    font-size: 13px;
+  }
+  
+  .page-info {
+    min-width: 65px;
+    font-size: 12px;
+  }
+  
+  .zoom-display {
+    font-size: 12px;
+    min-width: 45px;
+  }
+  
+  .pdf-viewer-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 1.5rem;
+  }
+}

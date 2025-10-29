@@ -221,12 +221,15 @@ class AuthenticationManager {
 
 // ==================== PDF VIEWER MANAGER ====================
 // Replace the PDFViewerManager class in app.js with this fixed version
+// ==================== PDF VIEWER MANAGER - COMPLETELY FIXED ====================
+// Replace your existing PDFViewerManager class with this one
+
 class PDFViewerManager {
   constructor(ebookUrl) {
     this.ebookUrl = ebookUrl;
     this.currentPage = 1;
-    this.currentZoom = 100;
-    this.totalPages = 450;
+    this.currentZoom = 75; // Start at 75% to match your screenshot
+    this.totalPages = 450; // Update this to your actual page count
     this.overlay = null;
     this.iframe = null;
   }
@@ -247,15 +250,23 @@ class PDFViewerManager {
             <span>Under the Banyan Tree - Decoding Numbers</span>
           </div>
           <div class="pdf-viewer-controls">
-            <button id="zoom-out-btn" class="pdf-control-btn" title="Zoom Out (-)">−</button>
-            <span id="zoom-level-display" class="zoom-display">100%</span>
-            <button id="zoom-in-btn" class="pdf-control-btn" title="Zoom In (+)">+</button>
+            <button id="zoom-out-btn" class="pdf-control-btn" title="Zoom Out (-)">
+              <span style="font-size: 20px; line-height: 1;">−</span>
+            </button>
+            <span id="zoom-level-display" class="zoom-display">${this.currentZoom}%</span>
+            <button id="zoom-in-btn" class="pdf-control-btn" title="Zoom In (+)">
+              <span style="font-size: 20px; line-height: 1;">+</span>
+            </button>
             <span class="control-divider">|</span>
-            <button id="prev-page-btn" class="pdf-control-btn" title="Previous Page (←)">◄</button>
-            <span class="page-info" id="page-info-display">1 / ${this.totalPages}</span>
-            <button id="next-page-btn" class="pdf-control-btn" title="Next Page (→)">►</button>
+            <button id="prev-page-btn" class="pdf-control-btn" title="Previous Page (←)">
+              <span>◄</span>
+            </button>
+            <span class="page-info" id="page-info-display">${this.currentPage} / ${this.totalPages}</span>
+            <button id="next-page-btn" class="pdf-control-btn" title="Next Page (→)">
+              <span>►</span>
+            </button>
             <span class="control-divider">|</span>
-            <input type="number" id="page-number-input" class="page-input" min="1" max="${this.totalPages}" value="1" placeholder="Page">
+            <input type="number" id="page-number-input" class="page-input" min="1" max="${this.totalPages}" value="${this.currentPage}">
             <button id="go-page-btn" class="pdf-control-btn" title="Go to Page">Go</button>
           </div>
           <button class="pdf-viewer-close" id="close-viewer-btn">&times;</button>
@@ -263,7 +274,7 @@ class PDFViewerManager {
         <div class="pdf-viewer-container" id="pdf-container-main">
           <iframe 
             id="pdf-iframe-viewer"
-            src="${this.ebookUrl}#page=1&zoom=100" 
+            src="" 
             frameborder="0"
             allowfullscreen>
           </iframe>
@@ -274,15 +285,32 @@ class PDFViewerManager {
     document.body.insertAdjacentHTML('beforeend', viewerHTML);
     document.body.style.overflow = 'hidden';
     
+    // Get references
     this.overlay = document.getElementById('pdf-overlay');
     this.iframe = document.getElementById('pdf-iframe-viewer');
+    this.zoomDisplay = document.getElementById('zoom-level-display');
     this.pageInfo = document.getElementById('page-info-display');
     this.pageInput = document.getElementById('page-number-input');
-    this.zoomDisplay = document.getElementById('zoom-level-display');
     
-    setTimeout(() => {
-      this.setupControls();
-    }, 100);
+    // Load PDF and setup controls
+    this.loadPDF();
+    this.setupControls();
+  }
+  
+  loadPDF() {
+    // Build the PDF URL with proper parameters
+    const pdfUrl = this.buildPDFUrl();
+    console.log('Loading PDF:', pdfUrl);
+    this.iframe.src = pdfUrl;
+  }
+  
+  buildPDFUrl() {
+    // Remove any existing hash from URL
+    const baseUrl = this.ebookUrl.split('#')[0];
+    
+    // Build new URL with page and zoom parameters
+    // Note: zoom parameter in PDF.js is a percentage value
+    return `${baseUrl}#page=${this.currentPage}&zoom=${this.currentZoom}`;
   }
   
   setupControls() {
@@ -293,64 +321,81 @@ class PDFViewerManager {
     const nextPageBtn = document.getElementById('next-page-btn');
     const goPageBtn = document.getElementById('go-page-btn');
     
-    if (!closeBtn) {
+    if (!closeBtn || !zoomInBtn) {
       console.error('PDF controls not found');
       return;
     }
     
+    // Close viewer
     closeBtn.addEventListener('click', () => {
       this.overlay.remove();
       document.body.style.overflow = '';
     });
     
+    // Zoom In - increment by 25%
     zoomInBtn.addEventListener('click', () => {
       if (this.currentZoom < 200) {
         this.currentZoom += 25;
-        this.updatePDFView();
+        this.reloadPDF();
+        console.log('Zoom in:', this.currentZoom + '%');
       }
     });
     
+    // Zoom Out - decrement by 25%
     zoomOutBtn.addEventListener('click', () => {
-      if (this.currentZoom > 50) {
+      if (this.currentZoom > 25) {
         this.currentZoom -= 25;
-        this.updatePDFView();
+        this.reloadPDF();
+        console.log('Zoom out:', this.currentZoom + '%');
       }
     });
     
+    // Previous Page
     prevPageBtn.addEventListener('click', () => {
       if (this.currentPage > 1) {
         this.currentPage--;
-        this.updatePDFView();
+        this.reloadPDF();
+        console.log('Previous page:', this.currentPage);
       }
     });
     
+    // Next Page
     nextPageBtn.addEventListener('click', () => {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
-        this.updatePDFView();
+        this.reloadPDF();
+        console.log('Next page:', this.currentPage);
       }
     });
     
+    // Go to Page
     goPageBtn.addEventListener('click', () => {
       const page = parseInt(this.pageInput.value);
       if (page && page > 0 && page <= this.totalPages) {
         this.currentPage = page;
-        this.updatePDFView();
+        this.reloadPDF();
+        console.log('Go to page:', page);
+      } else {
+        alert(`Please enter a valid page number between 1 and ${this.totalPages}`);
+        this.pageInput.value = this.currentPage;
       }
     });
     
+    // Enter key on page input
     this.pageInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         goPageBtn.click();
       }
     });
     
+    // Keyboard shortcuts
     const keyHandler = (e) => {
       if (!this.overlay || !this.overlay.parentNode) {
         document.removeEventListener('keydown', keyHandler);
         return;
       }
       
+      // Don't trigger if user is typing in input
       if (document.activeElement === this.pageInput) return;
       
       switch(e.key) {
@@ -371,6 +416,7 @@ class PDFViewerManager {
           e.preventDefault();
           break;
         case '-':
+        case '_':
           zoomOutBtn.click();
           e.preventDefault();
           break;
@@ -380,22 +426,32 @@ class PDFViewerManager {
     document.addEventListener('keydown', keyHandler);
   }
   
-  updatePDFView() {
-    if (!this.iframe) return;
+  reloadPDF() {
+    // Update the display elements
+    this.updateDisplay();
     
-    const baseUrl = this.ebookUrl.split('#')[0];
-    this.iframe.src = `${baseUrl}#page=${this.currentPage}&zoom=${this.currentZoom}`;
+    // Reload the PDF with new parameters
+    const newUrl = this.buildPDFUrl();
+    console.log('Reloading PDF with:', newUrl);
     
+    // Force reload by changing src
+    this.iframe.src = newUrl;
+  }
+  
+  updateDisplay() {
+    // Update zoom display
+    if (this.zoomDisplay) {
+      this.zoomDisplay.textContent = `${this.currentZoom}%`;
+    }
+    
+    // Update page info
     if (this.pageInfo) {
       this.pageInfo.textContent = `${this.currentPage} / ${this.totalPages}`;
     }
     
+    // Update page input
     if (this.pageInput) {
       this.pageInput.value = this.currentPage;
-    }
-    
-    if (this.zoomDisplay) {
-      this.zoomDisplay.textContent = `${this.currentZoom}%`;
     }
   }
 }
