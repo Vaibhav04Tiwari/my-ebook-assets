@@ -1,4 +1,5 @@
-// app.js - Object-Oriented Academic Portal with Navigation (FIXED)
+// app.js - Object-Oriented Academic Portal with Google Authentication
+// Version: 2.0 - Fixed Authentication Flow
 
 // ==================== CONFIGURATION ====================
 class Config {
@@ -114,11 +115,11 @@ class AuthenticationManager {
   }
   
   isAuthenticated() {
-    return !!localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
+    return !!token;
   }
   
   redirectToGoogleSignIn() {
-    // Use fixed redirect URI from config
     const redirectUri = Config.REDIRECT_URI;
     
     const authUrl = `${this.config.cognitoDomain}/oauth2/authorize?` +
@@ -154,7 +155,6 @@ class AuthenticationManager {
   }
   
   async exchangeCodeForTokens(code) {
-    // Use same redirect URI as authorization
     const redirectUri = Config.REDIRECT_URI;
     
     try {
@@ -186,7 +186,6 @@ class AuthenticationManager {
         localStorage.setItem('accessToken', responseData.access_token);
         localStorage.setItem('idToken', responseData.id_token);
         
-        // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname);
         
         console.log('✅ Authentication successful!');
@@ -262,7 +261,7 @@ class PDFViewerManager {
     const closeBtn = document.getElementById('close-viewer-btn');
     
     if (!closeBtn) {
-      console.error('Close button not found');
+      console.error('❌ Close button not found');
       return;
     }
     
@@ -676,7 +675,10 @@ class AcademicPortalApp {
       const solutionsBtn2 = document.getElementById('solutions-btn-2');
       
       if (accessBtn) {
+        console.log('✅ Access E-Book button found');
         accessBtn.addEventListener('click', () => this.handleAccessEbook());
+      } else {
+        console.error('❌ Access E-Book button NOT found!');
       }
       
       if (solutionsBtn) {
@@ -701,16 +703,35 @@ class AcademicPortalApp {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         });
       }
+      
+      // Debug helper
+      window.debugAuth = () => {
+        console.log('=== AUTH DEBUG INFO ===');
+        console.log('Access Token:', localStorage.getItem('accessToken'));
+        console.log('ID Token:', localStorage.getItem('idToken'));
+        console.log('Download Intent:', localStorage.getItem('downloadIntent'));
+        console.log('Is Authenticated:', this.authManager.isAuthenticated());
+        console.log('======================');
+      };
+      console.log('💡 Tip: Run debugAuth() in console for auth info');
+      
     }, 300);
   }
   
   handleAccessEbook() {
     console.log('📖 Access E-Book clicked');
     
-    if (this.authManager.isAuthenticated()) {
+    const isAuth = this.authManager.isAuthenticated();
+    console.log('🔐 Is Authenticated?', isAuth);
+    console.log('🔑 Access Token:', localStorage.getItem('accessToken'));
+    
+    if (isAuth) {
+      console.log('✅ User is authenticated - Opening viewer');
       this.openEbookViewer();
     } else {
+      console.log('❌ User NOT authenticated - Showing sign-in modal');
       this.uiManager.showGoogleSignInModal(() => {
+        console.log('🔄 User clicked Sign in with Google');
         localStorage.setItem('downloadIntent', 'ebook');
         this.authManager.redirectToGoogleSignIn();
       });
