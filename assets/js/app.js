@@ -19,7 +19,7 @@ class Config {
   };
   
   // Fixed redirect URI - matches Cognito configuration
-  static REDIRECT_URI = 'https://my-ebook-assets.vercel.app';
+  static REDIRECT_URI = window.location.origin;
 }
 
 // ==================== NAVIGATION MANAGER ====================
