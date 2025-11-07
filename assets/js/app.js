@@ -117,24 +117,26 @@ class AuthenticationManager {
     const token = localStorage.getItem('accessToken');
     return !!token;
   }
-  
   redirectToGoogleSignIn() {
-    const redirectUri = Config.REDIRECT_URI;
-    
-    // FIXED: Properly format the scope parameter
-    const authUrl = `${this.config.cognitoDomain}/oauth2/authorize?` +
-      `identity_provider=Google&` +
-      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-      `response_type=code&` +
-      `client_id=${this.config.clientId}&` +
-      `scope=openid+email+profile`;  // Changed from %20 to + for spaces
-    
-    console.log('🔐 Starting Google OAuth Flow');
-    console.log('📍 Redirect URI:', redirectUri);
-    console.log('🔗 Auth URL:', authUrl);
-    
-    window.location.href = authUrl;
-  }
+  const redirectUri = Config.REDIRECT_URI;
+  
+  // Build URL with proper encoding
+  const params = new URLSearchParams({
+    identity_provider: 'Google',
+    redirect_uri: redirectUri,
+    response_type: 'code',
+    client_id: this.config.clientId,
+    scope: 'openid email profile'  // URLSearchParams will handle encoding
+  });
+  
+  const authUrl = `${this.config.cognitoDomain}/oauth2/authorize?${params.toString()}`;
+  
+  console.log('🔐 Starting Google OAuth Flow');
+  console.log('📍 Redirect URI:', redirectUri);
+  console.log('🔗 Auth URL:', authUrl);
+  
+  window.location.href = authUrl;
+}
   
   async handleCallback() {
     const urlParams = new URLSearchParams(window.location.search);
