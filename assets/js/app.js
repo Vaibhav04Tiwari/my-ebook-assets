@@ -3,9 +3,9 @@
 // ==================== CONFIGURATION ====================
 class Config {
   static AWS = {
-    userPoolId: 'us-east-1_Oeh7iH12H',
-    clientId: '5gfu0h940eejksp0ekuqi1s9lh',
-    cognitoDomain: 'https://us-east-1oeh7ih12h.auth.us-east-1.amazoncognito.com'
+    userPoolId: 'ap-south-1_PWJLMbCii',
+    clientId: '4nt4gl74g0d0i4qlfodp2poq3g',
+    cognitoDomain: 'https://ap-south-1pwjlmbcii.auth.ap-south-1.amazoncognito.com'
   };
   
   static SOLUTION_FILE = {
