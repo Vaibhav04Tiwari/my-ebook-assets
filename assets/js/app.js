@@ -107,8 +107,7 @@ class NavigationManager {
     activeLink.classList.add('active');
   }
 }
-
-// ==================== AUTHENTICATION MANAGER ====================
+// ==================== AUTHENTICATION MANAGER (FIXED) ====================
 class AuthenticationManager {
   constructor(config) {
     this.config = config;
@@ -122,12 +121,13 @@ class AuthenticationManager {
   redirectToGoogleSignIn() {
     const redirectUri = Config.REDIRECT_URI;
     
+    // FIXED: Properly format the scope parameter
     const authUrl = `${this.config.cognitoDomain}/oauth2/authorize?` +
       `identity_provider=Google&` +
       `redirect_uri=${encodeURIComponent(redirectUri)}&` +
       `response_type=code&` +
       `client_id=${this.config.clientId}&` +
-      `scope=openid%20email%20profile`;
+      `scope=openid+email+profile`;  // Changed from %20 to + for spaces
     
     console.log('🔐 Starting Google OAuth Flow');
     console.log('📍 Redirect URI:', redirectUri);
@@ -186,6 +186,7 @@ class AuthenticationManager {
         localStorage.setItem('accessToken', responseData.access_token);
         localStorage.setItem('idToken', responseData.id_token);
         
+        // Clean up URL
         window.history.replaceState({}, document.title, window.location.pathname);
         
         console.log('✅ Authentication successful!');
