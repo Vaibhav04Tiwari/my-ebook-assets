@@ -19,7 +19,7 @@ class Config {
   };
   
   // Fixed redirect URI - matches Cognito configuration
-  static REDIRECT_URI = window.location.origin;
+ static REDIRECT_URI = 'https://main.d3oh16juhi8svs.amplifyapp.com';
 }
 
 // ==================== NAVIGATION MANAGER ====================
