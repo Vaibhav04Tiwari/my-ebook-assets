@@ -1,5 +1,5 @@
 // app.js - Object-Oriented Academic Portal with Google Authentication
-// Version: 2.0 - Fixed Authentication Flow
+// Version: 2.1 - Download E-Book After Sign-In
 
 // ==================== CONFIGURATION ====================
 class Config {
@@ -15,11 +15,12 @@ class Config {
   };
   
   static EBOOK_FILE = {
-    url: 'https://my-ebook-assets.s3.us-east-1.amazonaws.com/ISI_Book_Number_Theory.pdf'
+    url: 'https://my-ebook-assets.s3.us-east-1.amazonaws.com/ISI_Book_Number_Theory.pdf',
+    filename: 'Under_the_Banyan_Tree_Number_Theory.pdf'
   };
   
   // Fixed redirect URI - matches Cognito configuration
- static REDIRECT_URI = 'https://main.d3oh16juhi8svs.amplifyapp.com';
+  static REDIRECT_URI = 'https://main.d3oh16juhi8svs.amplifyapp.com';
 }
 
 // ==================== NAVIGATION MANAGER ====================
@@ -107,7 +108,8 @@ class NavigationManager {
     activeLink.classList.add('active');
   }
 }
-// ==================== AUTHENTICATION MANAGER (FIXED) ====================
+
+// ==================== AUTHENTICATION MANAGER ====================
 class AuthenticationManager {
   constructor(config) {
     this.config = config;
@@ -117,26 +119,26 @@ class AuthenticationManager {
     const token = localStorage.getItem('accessToken');
     return !!token;
   }
+  
   redirectToGoogleSignIn() {
-  const redirectUri = Config.REDIRECT_URI;
-  
-  // Build URL with proper encoding
-  const params = new URLSearchParams({
-    identity_provider: 'Google',
-    redirect_uri: redirectUri,
-    response_type: 'code',
-    client_id: this.config.clientId,
-    scope: 'openid email profile'  // URLSearchParams will handle encoding
-  });
-  
-  const authUrl = `${this.config.cognitoDomain}/oauth2/authorize?${params.toString()}`;
-  
-  console.log('🔐 Starting Google OAuth Flow');
-  console.log('📍 Redirect URI:', redirectUri);
-  console.log('🔗 Auth URL:', authUrl);
-  
-  window.location.href = authUrl;
-}
+    const redirectUri = Config.REDIRECT_URI;
+    
+    const params = new URLSearchParams({
+      identity_provider: 'Google',
+      redirect_uri: redirectUri,
+      response_type: 'code',
+      client_id: this.config.clientId,
+      scope: 'openid email profile'
+    });
+    
+    const authUrl = `${this.config.cognitoDomain}/oauth2/authorize?${params.toString()}`;
+    
+    console.log('🔐 Starting Google OAuth Flow');
+    console.log('📍 Redirect URI:', redirectUri);
+    console.log('🔗 Auth URL:', authUrl);
+    
+    window.location.href = authUrl;
+  }
   
   async handleCallback() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -188,7 +190,6 @@ class AuthenticationManager {
         localStorage.setItem('accessToken', responseData.access_token);
         localStorage.setItem('idToken', responseData.id_token);
         
-        // Clean up URL
         window.history.replaceState({}, document.title, window.location.pathname);
         
         console.log('✅ Authentication successful!');
@@ -213,86 +214,6 @@ class AuthenticationManager {
   }
 }
 
-// ==================== PDF VIEWER MANAGER ====================
-class PDFViewerManager {
-  constructor(ebookUrl) {
-    this.ebookUrl = ebookUrl;
-    this.overlay = null;
-    this.iframe = null;
-  }
-  
-  openEmbeddedViewer() {
-    if (!this.ebookUrl) {
-      alert('E-Book URL not configured. Please add your PDF URL.');
-      return;
-    }
-    
-    console.log('📖 Opening E-Book viewer');
-    
-    const viewerHTML = `
-      <div class="pdf-viewer-overlay" id="pdf-overlay">
-        <div class="pdf-viewer-header">
-          <div class="pdf-viewer-title">
-            <span class="viewer-icon">📖</span>
-            <span>Under the Banyan Tree - Decoding Numbers</span>
-          </div>
-          <button class="pdf-viewer-close" id="close-viewer-btn" title="Close (Esc)">
-            &times;
-          </button>
-        </div>
-        <div class="pdf-viewer-container" id="pdf-container-main">
-          <iframe 
-            id="pdf-iframe-viewer"
-            src="${this.ebookUrl}" 
-            frameborder="0"
-            allowfullscreen>
-          </iframe>
-        </div>
-      </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', viewerHTML);
-    document.body.style.overflow = 'hidden';
-    
-    this.overlay = document.getElementById('pdf-overlay');
-    this.iframe = document.getElementById('pdf-iframe-viewer');
-    
-    this.setupControls();
-  }
-  
-  setupControls() {
-    const closeBtn = document.getElementById('close-viewer-btn');
-    
-    if (!closeBtn) {
-      console.error('❌ Close button not found');
-      return;
-    }
-    
-    closeBtn.addEventListener('click', () => this.closeViewer());
-    
-    const keyHandler = (e) => {
-      if (!this.overlay || !this.overlay.parentNode) {
-        document.removeEventListener('keydown', keyHandler);
-        return;
-      }
-      
-      if (e.key === 'Escape') {
-        this.closeViewer();
-      }
-    };
-    
-    document.addEventListener('keydown', keyHandler);
-  }
-  
-  closeViewer() {
-    if (this.overlay && this.overlay.parentNode) {
-      this.overlay.remove();
-      document.body.style.overflow = '';
-      console.log('📖 PDF viewer closed');
-    }
-  }
-}
-
 // ==================== DOWNLOAD MANAGER ====================
 class DownloadManager {
   constructor(fileConfig) {
@@ -300,7 +221,7 @@ class DownloadManager {
   }
   
   startDownload() {
-    console.log('📥 Starting file download');
+    console.log('📥 Starting file download:', this.fileConfig.filename);
     
     const link = document.createElement('a');
     link.href = this.fileConfig.url;
@@ -463,8 +384,8 @@ class GoogleSignInModal extends Modal {
     const content = `
       <div class="auth-modal-content">
         <span class="modal-close">&times;</span>
-        <h2>Sign In to Access E-Book</h2>
-        <p>Please sign in with Google to read the textbook</p>
+        <h2>Sign In to Download E-Book</h2>
+        <p>Please sign in with Google to download the textbook</p>
         
         <div class="auth-buttons">
           <button id="google-signin-btn" class="google-btn">
@@ -550,9 +471,6 @@ class Footer extends PageComponent {
           <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">
             <a href="#terms" data-section="terms" style="color: #4CAF50; text-decoration: none; font-weight: 500;">Terms & Conditions</a>
           </p>
-          <p style="font-size: 0.85rem; color: #ccc;">
-            Contact: <a href="mailto:thebanyantreebook@gmail.com" style="color: #4CAF50; text-decoration: none;">thebanyantreebook@gmail.com</a>
-          </p>
         </div>
       </div>
       <div class="footer-bottom">
@@ -607,12 +525,12 @@ class BookCard {
         </div>
         <div class="actions">
           <button id="access-ebook-btn" class="btn btn--secondary">
-            <span class="btn-icon">📖</span>
-            <span>Access E-Book</span>
+            <span class="btn-icon">📥</span>
+            <span>Download E-Book</span>
           </button>
           <button id="solutions-btn" class="btn btn--primary">
             <span class="btn-icon">📥</span>
-            <span>Solutions</span>
+            <span>Download Solutions</span>
           </button>
         </div>
       `;
@@ -624,8 +542,8 @@ class BookCard {
 class AcademicPortalApp {
   constructor() {
     this.authManager = new AuthenticationManager(Config.AWS);
-    this.downloadManager = new DownloadManager(Config.SOLUTION_FILE);
-    this.pdfViewerManager = new PDFViewerManager(Config.EBOOK_FILE.url);
+    this.solutionDownloadManager = new DownloadManager(Config.SOLUTION_FILE);
+    this.ebookDownloadManager = new DownloadManager(Config.EBOOK_FILE);
     this.uiManager = new UIManager();
     this.navigationManager = new NavigationManager();
   }
@@ -645,10 +563,10 @@ class AcademicPortalApp {
       const downloadIntent = localStorage.getItem('downloadIntent');
       if (downloadIntent === 'ebook') {
         localStorage.removeItem('downloadIntent');
-        this.openEbookViewer();
+        this.downloadEbook();
       } else if (downloadIntent === 'solutions') {
         localStorage.removeItem('downloadIntent');
-        this.handleSuccessfulDownload();
+        this.downloadSolutions();
       }
     }
     
@@ -678,10 +596,10 @@ class AcademicPortalApp {
       const solutionsBtn2 = document.getElementById('solutions-btn-2');
       
       if (accessBtn) {
-        console.log('✅ Access E-Book button found');
-        accessBtn.addEventListener('click', () => this.handleAccessEbook());
+        console.log('✅ Download E-Book button found');
+        accessBtn.addEventListener('click', () => this.handleEbookClick());
       } else {
-        console.error('❌ Access E-Book button NOT found!');
+        console.error('❌ Download E-Book button NOT found!');
       }
       
       if (solutionsBtn) {
@@ -721,16 +639,16 @@ class AcademicPortalApp {
     }, 300);
   }
   
-  handleAccessEbook() {
-    console.log('📖 Access E-Book clicked');
+  handleEbookClick() {
+    console.log('📥 Download E-Book clicked');
     
     const isAuth = this.authManager.isAuthenticated();
     console.log('🔐 Is Authenticated?', isAuth);
     console.log('🔑 Access Token:', localStorage.getItem('accessToken'));
     
     if (isAuth) {
-      console.log('✅ User is authenticated - Opening viewer');
-      this.openEbookViewer();
+      console.log('✅ User is authenticated - Starting download');
+      this.downloadEbook();
     } else {
       console.log('❌ User NOT authenticated - Showing sign-in modal');
       this.uiManager.showGoogleSignInModal(() => {
@@ -741,24 +659,33 @@ class AcademicPortalApp {
     }
   }
   
-  openEbookViewer() {
-    console.log('📖 Opening E-Book viewer');
-    this.pdfViewerManager.openEmbeddedViewer();
+  downloadEbook() {
+    console.log('📥 Downloading E-Book');
+    this.uiManager.showSuccessNotification(
+      'Download Started!',
+      'Your e-book is downloading now'
+    );
+    
+    setTimeout(() => {
+      this.ebookDownloadManager.startDownload();
+    }, 500);
   }
   
   handleSolutionsClick() {
-    console.log('📥 Solutions button clicked');
-    this.handleSuccessfulDownload();
+    console.log('📥 Download Solutions clicked');
+    // Solutions don't require authentication
+    this.downloadSolutions();
   }
   
-  handleSuccessfulDownload() {
+  downloadSolutions() {
+    console.log('📥 Downloading Solutions');
     this.uiManager.showSuccessNotification(
       'Download Started!',
       'Your solution file is downloading now'
     );
     
     setTimeout(() => {
-      this.downloadManager.startDownload();
+      this.solutionDownloadManager.startDownload();
     }, 500);
   }
 }
