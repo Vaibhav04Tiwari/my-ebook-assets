@@ -19,10 +19,8 @@ class Config {
     filename: 'Under_the_Banyan_Tree_Number_Theory.pdf'
   };
   
-  // Dynamic redirect URI - uses current domain (with or without www)
-  static get REDIRECT_URI() {
-    return window.location.origin;
-  }
+  // Fixed redirect URI - matches Cognito configuration (with www)
+  static REDIRECT_URI = 'https://main.d3oh16juhi8svs.amplifyapp.com';
 }
 
 // ==================== NAVIGATION MANAGER ====================
