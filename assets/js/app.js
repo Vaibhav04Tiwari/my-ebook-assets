@@ -18,7 +18,7 @@ class Config {
   };
   
   // Fixed redirect URI - matches Cognito configuration
-  static REDIRECT_URI ='https://thebanyantreebook.com';
+  static REDIRECT_URI ='https://www.thebanyantreebook.com';
 }
 
 // ==================== NAVIGATION MANAGER ====================
