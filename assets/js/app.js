@@ -1,5 +1,5 @@
 // app.js - Object-Oriented Academic Portal with Google Authentication
-// Version: 2.1 - Download E-Book After Sign-In
+// Version: 2.2 - Amazon Redirect for Solutions
 
 // ==================== CONFIGURATION ====================
 class Config {
@@ -9,19 +9,14 @@ class Config {
     cognitoDomain: 'https://ap-south-1pwjlmbcii.auth.ap-south-1.amazoncognito.com'
   };
   
-  static SOLUTION_FILE = {
-    url: './assets/ISI_Book_Number_Theory_Solutions.pdf',
-    filename: 'ISI_Book_Number_Theory_Solutions.pdf'
-  };
+  static SOLUTION_LINK = 'https://www.amazon.in/dp/B0G2B378HH';
   
   static EBOOK_FILE = {
     url: 'https://my-ebook-assets.s3.us-east-1.amazonaws.com/ISI_Book_Number_Theory.pdf',
     filename: 'Under_the_Banyan_Tree_Number_Theory.pdf'
   };
   
-  // Fixed redirect URI - matches Cognito configuration (with www)
-  // static REDIRECT_URI = 'https://main.d3oh16juhi8svs.amplifyapp.com';
-static REDIRECT_URI = 'https://thebanyantreebook.com';
+  static REDIRECT_URI = 'https://thebanyantreebook.com';
 }
 
 // ==================== NAVIGATION MANAGER ====================
@@ -530,8 +525,8 @@ class BookCard {
             <span>Download E-Book</span>
           </button>
           <button id="solutions-btn" class="btn btn--primary">
-            <span class="btn-icon">📥</span>
-            <span>Download Solutions</span>
+            <span class="btn-icon">🛒</span>
+            <span>Buy Solutions on Amazon</span>
           </button>
         </div>
       `;
@@ -543,7 +538,6 @@ class BookCard {
 class AcademicPortalApp {
   constructor() {
     this.authManager = new AuthenticationManager(Config.AWS);
-    this.solutionDownloadManager = new DownloadManager(Config.SOLUTION_FILE);
     this.ebookDownloadManager = new DownloadManager(Config.EBOOK_FILE);
     this.uiManager = new UIManager();
     this.navigationManager = new NavigationManager();
@@ -565,9 +559,6 @@ class AcademicPortalApp {
       if (downloadIntent === 'ebook') {
         localStorage.removeItem('downloadIntent');
         this.downloadEbook();
-      } else if (downloadIntent === 'solutions') {
-        localStorage.removeItem('downloadIntent');
-        this.downloadSolutions();
       }
     }
     
@@ -673,21 +664,9 @@ class AcademicPortalApp {
   }
   
   handleSolutionsClick() {
-    console.log('📥 Download Solutions clicked');
-    // Solutions don't require authentication
-    this.downloadSolutions();
-  }
-  
-  downloadSolutions() {
-    console.log('📥 Downloading Solutions');
-    this.uiManager.showSuccessNotification(
-      'Download Started!',
-      'Your solution file is downloading now'
-    );
-    
-    setTimeout(() => {
-      this.solutionDownloadManager.startDownload();
-    }, 500);
+    console.log('🛒 Redirecting to Amazon for Solutions');
+    // Redirect to Amazon product page
+    window.open(Config.SOLUTION_LINK, '_blank');
   }
 }
 
