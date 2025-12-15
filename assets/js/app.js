@@ -16,7 +16,7 @@ class Config {
     filename: 'Under_the_Banyan_Tree_Number_Theory.pdf'
   };
   
-  static REDIRECT_URI = 'https://thebanyantreebook.com';
+ static REDIRECT_URI = window.location.origin;
   static COACHING_PAGE_URL = 'course.html';
 }
 
