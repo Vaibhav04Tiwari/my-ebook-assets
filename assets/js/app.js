@@ -16,7 +16,7 @@ class Config {
     filename: 'Under_the_Banyan_Tree_Number_Theory.pdf'
   };
   
- static REDIRECT_URI = window.location.origin;
+  static REDIRECT_URI = window.location.origin;
   static COACHING_PAGE_URL = 'course.html';
 }
 
@@ -226,16 +226,54 @@ class DownloadManager {
   }
   
   async startDownload() {
-    console.log('📥 Starting background download:', this.fileConfig.filename);
+    console.log('📥 Starting silent background download:', this.fileConfig.filename);
     
     try {
-      const response = await fetch(this.fileConfig.url);
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
+      // Fetch the file
+      console.log('🔄 Fetching PDF from:', this.fileConfig.url);
+      const response = await fetch(this.fileConfig.url, {
+        mode: 'cors',
+        credentials: 'omit'
+      });
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const blob = await response.blob();
+      console.log('✅ Blob created, size:', blob.size);
+      
+      // Create download link
+      const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
       link.download = this.fileConfig.filename;
+      link.style.display = 'none';
+      
+      // Trigger download
+      document.body.appendChild(link);
+      console.log('🖱️ Triggering download...');
+      link.click();
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+        console.log('🧹 Cleanup completed');
+      }, 100);
+      
+      console.log('✅ Silent download initiated successfully');
+      return true;
+      
+    } catch (error) {
+      console.error('❌ Fetch failed, trying direct link method:', error);
+      
+      // Fallback: Use direct link with download attribute
+      const link = document.createElement('a');
+      link.href = this.fileConfig.url;
+      link.download = this.fileConfig.filename;
+      link.target = '_blank'; // Open in new tab if download doesn't work
+      link.rel = 'noopener noreferrer';
       link.style.display = 'none';
       
       document.body.appendChild(link);
@@ -243,21 +281,9 @@ class DownloadManager {
       
       setTimeout(() => {
         document.body.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
       }, 100);
       
-      console.log('✅ Download initiated successfully');
-      return true;
-    } catch (error) {
-      console.error('❌ Download error:', error);
-      // Fallback: direct link
-      const link = document.createElement('a');
-      link.href = this.fileConfig.url;
-      link.download = this.fileConfig.filename;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      console.log('✅ Fallback download method executed');
       return true;
     }
   }
@@ -590,28 +616,13 @@ class AcademicPortalApp {
       // Check if user wanted to download ebook
       const downloadIntent = localStorage.getItem('downloadIntent');
       if (downloadIntent === 'ebook') {
-        console.log('📥 Download intent detected - processing...');
+        console.log('📥 Download intent detected - starting process...');
         localStorage.removeItem('downloadIntent');
         
-        // Show loading modal
-        const loadingModal = this.uiManager.showLoadingModal();
+        // Trigger download and redirect immediately
+        this.downloadEbookAndRedirect();
         
-        // Start download in background
-        await this.ebookDownloadManager.startDownload();
-        
-        // Remove loading modal
-        setTimeout(() => {
-          loadingModal.remove();
-          
-          // Show success alert
-          alert('📚 Your e-book download has started!\n\nYou will now be redirected to view our ISI Coaching program.');
-          
-          // Redirect to course page
-          console.log('🚀 Redirecting to course.html...');
-          window.location.href = Config.COACHING_PAGE_URL;
-        }, 1500);
-        
-        return; // Don't setup event listeners yet since we're redirecting
+        return; // Don't setup event listeners since we're redirecting
       }
     }
     
@@ -705,58 +716,32 @@ class AcademicPortalApp {
   async downloadEbookAndRedirect() {
     console.log('📥 ========== DOWNLOAD & REDIRECT START ==========');
     
-    // Show loading modal
-    const loadingModal = this.uiManager.showLoadingModal();
-    
     try {
-      // Start download
-      console.log('📥 Initiating download...');
+      // Start download silently in background
+      console.log('📥 Starting background download...');
       await this.ebookDownloadManager.startDownload();
-      console.log('✅ Download initiated successfully');
-    } catch (error) {
-      console.error('❌ Download error:', error);
-    }
-    
-    // Close loading modal
-    console.log('🔄 Closing loading modal...');
-    loadingModal.remove();
-    
-    // Small delay to let download start
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Show alert
-    console.log('📢 Showing alert to user...');
-    alert('📚 Your e-book download has started!\n\nClick OK to continue to our ISI Coaching program.');
-    
-    // Redirect with multiple fallback methods
-    console.log('🚀 Alert closed - Initiating redirect...');
-    console.log('📍 Current URL:', window.location.href);
-    console.log('📍 Target URL:', Config.COACHING_PAGE_URL);
-    
-    try {
-      // Method 1: window.location.href
-      console.log('Attempting redirect method 1: window.location.href');
+      console.log('✅ Download triggered successfully');
+      
+      // Small delay to ensure download starts before redirect
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Show alert
+      console.log('📢 Showing download notification...');
+      alert('📚 Your e-book is downloading!\n\nClick OK to view our ISI Coaching program.');
+      
+      // Redirect immediately after user clicks OK
+      console.log('🚀 Redirecting to course page...');
+      console.log('📍 Target URL:', Config.COACHING_PAGE_URL);
+      
       window.location.href = Config.COACHING_PAGE_URL;
       
-      // Fallback after 500ms if first method didn't work
-      setTimeout(() => {
-        console.log('Attempting redirect method 2: window.location.replace');
-        window.location.replace(Config.COACHING_PAGE_URL);
-      }, 500);
-      
-      // Final fallback after 1000ms
-      setTimeout(() => {
-        console.log('Attempting redirect method 3: window.location.assign');
-        window.location.assign(Config.COACHING_PAGE_URL);
-      }, 1000);
-      
     } catch (error) {
-      console.error('❌ Redirect error:', error);
-      // Manual redirect as last resort
-      window.open(Config.COACHING_PAGE_URL, '_self');
+      console.error('❌ Error in download/redirect process:', error);
+      
+      // Even if download fails, still show alert and redirect
+      alert('📚 Preparing your e-book...\n\nClick OK to view our ISI Coaching program.');
+      window.location.href = Config.COACHING_PAGE_URL;
     }
-    
-    console.log('✅ Redirect commands executed');
   }
   
   handleSolutionsClick() {
