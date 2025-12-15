@@ -1,5 +1,5 @@
-// app.js - Object-Oriented Academic Portal with Google Authentication
-// Version: 2.2 - Amazon Redirect for Solutions
+// app.js - Academic Portal with Google Authentication & Course Redirect
+// Version: 4.0 - Fixed Authentication Flow
 
 // ==================== CONFIGURATION ====================
 class Config {
@@ -17,6 +17,7 @@ class Config {
   };
   
   static REDIRECT_URI = 'https://thebanyantreebook.com';
+  static COACHING_PAGE_URL = 'course.html';
 }
 
 // ==================== NAVIGATION MANAGER ====================
@@ -133,6 +134,9 @@ class AuthenticationManager {
     console.log('📍 Redirect URI:', redirectUri);
     console.log('🔗 Auth URL:', authUrl);
     
+    // Set flag that user wants to download ebook
+    localStorage.setItem('downloadIntent', 'ebook');
+    
     window.location.href = authUrl;
   }
   
@@ -145,6 +149,7 @@ class AuthenticationManager {
       console.error('❌ OAuth Error:', error);
       const errorDesc = urlParams.get('error_description');
       if (errorDesc) console.error('Error Description:', errorDesc);
+      localStorage.removeItem('downloadIntent');
       return false;
     }
     
@@ -179,6 +184,7 @@ class AuthenticationManager {
       if (!response.ok) {
         console.error('❌ Token exchange failed:', response.status);
         console.error('Response:', responseData);
+        localStorage.removeItem('downloadIntent');
         return false;
       }
       
@@ -186,6 +192,7 @@ class AuthenticationManager {
         localStorage.setItem('accessToken', responseData.access_token);
         localStorage.setItem('idToken', responseData.id_token);
         
+        // Clean URL by removing OAuth parameters
         window.history.replaceState({}, document.title, window.location.pathname);
         
         console.log('✅ Authentication successful!');
@@ -194,10 +201,12 @@ class AuthenticationManager {
       
       console.error('❌ No access token in response');
       console.error('Response:', responseData);
+      localStorage.removeItem('downloadIntent');
       return false;
       
     } catch (error) {
       console.error('❌ Token exchange error:', error);
+      localStorage.removeItem('downloadIntent');
       return false;
     }
   }
@@ -216,19 +225,41 @@ class DownloadManager {
     this.fileConfig = fileConfig;
   }
   
-  startDownload() {
-    console.log('📥 Starting file download:', this.fileConfig.filename);
+  async startDownload() {
+    console.log('📥 Starting background download:', this.fileConfig.filename);
     
-    const link = document.createElement('a');
-    link.href = this.fileConfig.url;
-    link.download = this.fileConfig.filename;
-    link.target = '_blank';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    console.log('✅ Download initiated');
+    try {
+      const response = await fetch(this.fileConfig.url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = this.fileConfig.filename;
+      link.style.display = 'none';
+      
+      document.body.appendChild(link);
+      link.click();
+      
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      }, 100);
+      
+      console.log('✅ Download initiated successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ Download error:', error);
+      // Fallback: direct link
+      const link = document.createElement('a');
+      link.href = this.fileConfig.url;
+      link.download = this.fileConfig.filename;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return true;
+    }
   }
 }
 
@@ -303,8 +334,8 @@ class LoadingModal extends Modal {
     const content = `
       <div class="auth-modal-content loading-content">
         <div class="loading-spinner"></div>
-        <h3>Authenticating...</h3>
-        <p>Verifying your credentials</p>
+        <h3>Processing...</h3>
+        <p>Please wait while we prepare your download</p>
       </div>
     `;
     this.create(content);
@@ -363,7 +394,7 @@ class SuccessNotification {
     setTimeout(() => {
       this.element.classList.add('fade-out');
       setTimeout(() => this.remove(), 300);
-    }, 4000);
+    }, 3000);
   }
   
   remove() {
@@ -549,16 +580,38 @@ class AcademicPortalApp {
     this.renderComponents();
     this.navigationManager.init();
     
-    // Handle OAuth callback
+    // Check if user just returned from Google OAuth
     const authSuccess = await this.authManager.handleCallback();
     
     if (authSuccess) {
+      console.log('✅ User authenticated successfully');
       this.uiManager.removeAllModals();
       
+      // Check if user wanted to download ebook
       const downloadIntent = localStorage.getItem('downloadIntent');
       if (downloadIntent === 'ebook') {
+        console.log('📥 Download intent detected - processing...');
         localStorage.removeItem('downloadIntent');
-        this.downloadEbook();
+        
+        // Show loading modal
+        const loadingModal = this.uiManager.showLoadingModal();
+        
+        // Start download in background
+        await this.ebookDownloadManager.startDownload();
+        
+        // Remove loading modal
+        setTimeout(() => {
+          loadingModal.remove();
+          
+          // Show success alert
+          alert('📚 Your e-book download has started!\n\nYou will now be redirected to view our ISI Coaching program.');
+          
+          // Redirect to course page
+          console.log('🚀 Redirecting to course.html...');
+          window.location.href = Config.COACHING_PAGE_URL;
+        }, 1500);
+        
+        return; // Don't setup event listeners yet since we're redirecting
       }
     }
     
@@ -632,46 +685,89 @@ class AcademicPortalApp {
   }
   
   handleEbookClick() {
-    console.log('📥 Download E-Book clicked');
+    console.log('📥 Download E-Book button clicked');
     
     const isAuth = this.authManager.isAuthenticated();
     console.log('🔐 Is Authenticated?', isAuth);
-    console.log('🔑 Access Token:', localStorage.getItem('accessToken'));
     
     if (isAuth) {
-      console.log('✅ User is authenticated - Starting download');
-      this.downloadEbook();
+      console.log('✅ User already authenticated - Starting download');
+      this.downloadEbookAndRedirect();
     } else {
       console.log('❌ User NOT authenticated - Showing sign-in modal');
       this.uiManager.showGoogleSignInModal(() => {
         console.log('🔄 User clicked Sign in with Google');
-        localStorage.setItem('downloadIntent', 'ebook');
         this.authManager.redirectToGoogleSignIn();
       });
     }
   }
   
-  downloadEbook() {
-    console.log('📥 Downloading E-Book');
-    this.uiManager.showSuccessNotification(
-      'Download Started!',
-      'Your e-book is downloading now'
-    );
+  async downloadEbookAndRedirect() {
+    console.log('📥 ========== DOWNLOAD & REDIRECT START ==========');
     
-    setTimeout(() => {
-      this.ebookDownloadManager.startDownload();
-    }, 500);
+    // Show loading modal
+    const loadingModal = this.uiManager.showLoadingModal();
+    
+    try {
+      // Start download
+      console.log('📥 Initiating download...');
+      await this.ebookDownloadManager.startDownload();
+      console.log('✅ Download initiated successfully');
+    } catch (error) {
+      console.error('❌ Download error:', error);
+    }
+    
+    // Close loading modal
+    console.log('🔄 Closing loading modal...');
+    loadingModal.remove();
+    
+    // Small delay to let download start
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Show alert
+    console.log('📢 Showing alert to user...');
+    alert('📚 Your e-book download has started!\n\nClick OK to continue to our ISI Coaching program.');
+    
+    // Redirect with multiple fallback methods
+    console.log('🚀 Alert closed - Initiating redirect...');
+    console.log('📍 Current URL:', window.location.href);
+    console.log('📍 Target URL:', Config.COACHING_PAGE_URL);
+    
+    try {
+      // Method 1: window.location.href
+      console.log('Attempting redirect method 1: window.location.href');
+      window.location.href = Config.COACHING_PAGE_URL;
+      
+      // Fallback after 500ms if first method didn't work
+      setTimeout(() => {
+        console.log('Attempting redirect method 2: window.location.replace');
+        window.location.replace(Config.COACHING_PAGE_URL);
+      }, 500);
+      
+      // Final fallback after 1000ms
+      setTimeout(() => {
+        console.log('Attempting redirect method 3: window.location.assign');
+        window.location.assign(Config.COACHING_PAGE_URL);
+      }, 1000);
+      
+    } catch (error) {
+      console.error('❌ Redirect error:', error);
+      // Manual redirect as last resort
+      window.open(Config.COACHING_PAGE_URL, '_self');
+    }
+    
+    console.log('✅ Redirect commands executed');
   }
   
   handleSolutionsClick() {
     console.log('🛒 Redirecting to Amazon for Solutions');
-    // Redirect to Amazon product page
     window.open(Config.SOLUTION_LINK, '_blank');
   }
 }
 
 // ==================== APPLICATION ENTRY POINT ====================
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('🎬 DOM Content Loaded - Starting app');
   const app = new AcademicPortalApp();
   app.init();
 });

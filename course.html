@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ISI Coaching - Under the Banyan Tree</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap');
+
+    :root {
+      --primary: #2f5d3f;
+      --primary-hover: #1e3d2a;
+      --secondary: #5a7d67;
+      --bg-main: #f9fafb;
+      --bg-card: #ffffff;
+      --text-dark: #1f2937;
+      --text-medium: #4b5563;
+      --text-light: #6b7280;
+      --border-subtle: #e5e7eb;
+      --border-medium: #d1d5db;
+      --accent-light: #e8f4ed;
+      --accent-gold: #fbbf24;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-dark);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header */
+    .coaching-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .coaching-header h1 {
+      font-family: 'Merriweather', Georgia, serif;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .coaching-header p {
+      font-size: 1.1rem;
+      max-width: 800px;
+      margin: 0 auto;
+      opacity: 0.95;
+      line-height: 1.7;
+    }
+
+    /* Main Container */
+    .coaching-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    /* Description Section */
+    .coaching-description {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin-bottom: 3rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .coaching-description h2 {
+      font-family: 'Merriweather', Georgia, serif;
+      color: var(--primary);
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .coaching-description p {
+      color: var(--text-medium);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .feature-card {
+      background: var(--accent-light);
+      padding: 1.5rem;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .feature-card h3 {
+      color: var(--primary);
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .feature-card p {
+      color: var(--text-medium);
+      font-size: 0.95rem;
+    }
+
+    /* Demo Videos Section */
+    .demo-section {
+      margin-bottom: 3rem;
+    }
+
+    .demo-section h2 {
+      font-family: 'Merriweather', Georgia, serif;
+      color: var(--primary);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .demo-section .subtitle {
+      text-align: center;
+      color: var(--text-medium);
+      margin-bottom: 2.5rem;
+      font-size: 1.05rem;
+    }
+
+    .videos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .video-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-subtle);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .video-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .video-thumbnail {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #e8f4ed 0%, #d1e8d9 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .video-thumbnail::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba(47, 93, 63, 0.1) 0%, rgba(90, 125, 103, 0.1) 100%);
+    }
+
+    .play-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--primary);
+      z-index: 1;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .video-card:hover .play-icon {
+      transform: scale(1.1);
+      background: var(--primary);
+      color: white;
+    }
+
+    .video-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--primary);
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      z-index: 2;
+      box-shadow: var(--shadow-md);
+    }
+
+    .video-badge.locked {
+      background: var(--accent-gold);
+      color: var(--text-dark);
+    }
+
+    .video-info {
+      padding: 1.5rem;
+    }
+
+    .video-info h3 {
+      color: var(--text-dark);
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .video-info p {
+      color: var(--text-medium);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .video-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .video-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* Video Player Modal */
+    .video-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 9999;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .video-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-modal-content {
+      position: relative;
+      width: 90%;
+      max-width: 900px;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .video-player {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+    }
+
+    .close-video {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 2rem;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .close-video:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg);
+    }
+
+    /* Purchase Modal */
+    .purchase-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .purchase-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .purchase-content {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 3rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      position: relative;
+      animation: slideUp 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .purchase-content .icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .purchase-content h2 {
+      font-family: 'Merriweather', Georgia, serif;
+      color: var(--primary);
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .purchase-content p {
+      color: var(--text-medium);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .price-tag {
+      background: var(--accent-light);
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--primary);
+    }
+
+    .price-tag .original-price {
+      text-decoration: line-through;
+      color: var(--text-light);
+      font-size: 1rem;
+    }
+
+    .price-tag .discounted-price {
+      color: var(--primary);
+      font-size: 2rem;
+      font-weight: 700;
+      margin-top: 0.5rem;
+    }
+
+    .purchase-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--border-medium);
+    }
+
+    .btn-secondary:hover {
+      background: var(--accent-light);
+      border-color: var(--primary);
+    }
+
+    .close-purchase {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .close-purchase:hover {
+      color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .coaching-header h1 {
+        font-size: 2rem;
+      }
+
+      .coaching-header p {
+        font-size: 1rem;
+      }
+
+      .coaching-container {
+        padding: 2rem 1rem;
+      }
+
+      .coaching-description {
+        padding: 1.5rem;
+      }
+
+      .videos-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .purchase-content {
+        padding: 2rem 1.5rem;
+      }
+
+      .video-modal-content {
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="coaching-header">
+    <h1>🎓 ISI COACHING</h1>
+    <p>Master the Indian Statistical Institute Entrance Exam with Expert Guidance and Comprehensive Learning Resources</p>
+  </header>
+
+  <!-- Main Container -->
+  <div class="coaching-container">
+    <!-- Description Section -->
+    <section class="coaching-description">
+      <h2>Transform Your ISI Dream into Reality</h2>
+      <p>
+        Welcome to India's premier ISI coaching program, designed specifically for students aspiring to crack the prestigious Indian Statistical Institute entrance examination. Our comprehensive program combines decades of teaching expertise with modern pedagogical methods to ensure your success.
+      </p>
+      <p>
+        Whether you're targeting the B.Math, B.Stat, M.Math, or M.Stat programs, our meticulously crafted curriculum covers every aspect of the ISI syllabus with depth and clarity. We don't just teach concepts; we build problem-solving intuition that lasts a lifetime.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>📚 Complete Curriculum</h3>
+          <p>450+ hours of structured content covering Number Theory, Algebra, Calculus, Probability, and Statistics</p>
+        </div>
+        <div class="feature-card">
+          <h3>👨‍🏫 Expert Faculty</h3>
+          <p>Learn from ISI alumni and mathematicians with proven track records of producing top rankers</p>
+        </div>
+        <div class="feature-card">
+          <h3>📝 Practice Materials</h3>
+          <p>5000+ problems with detailed solutions, including past 25 years of ISI papers</p>
+        </div>
+        <div class="feature-card">
+          <h3>🎯 Personalized Guidance</h3>
+          <p>One-on-one doubt clearing sessions and customized study plans based on your strengths</p>
+        </div>
+        <div class="feature-card">
+          <h3>🏆 Proven Results</h3>
+          <p>85% success rate with students securing top 100 ranks in ISI entrance examinations</p>
+        </div>
+        <div class="feature-card">
+          <h3>💻 Online & Offline</h3>
+          <p>Flexible learning modes with live classes, recorded lectures, and interactive doubt sessions</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demo Videos Section -->
+    <section class="demo-section">
+      <h2>🎬 Free Demo Lectures</h2>
+      <p class="subtitle">Experience our teaching methodology with these free introductory sessions</p>
+
+      <div class="videos-grid">
+        <!-- Video 1 - Free -->
+        <div class="video-card" data-video="1">
+          <div class="video-thumbnail">
+            <span class="video-badge">Free</span>
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="video-info">
+            <h3>Introduction to Number Theory</h3>
+            <p>Discover the fundamentals of divisibility, prime numbers, and modular arithmetic with practical examples from ISI papers.</p>
+            <div class="video-meta">
+              <span>⏱️ 45 min</span>
+              <span>📊 Beginner</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video 2 - Free -->
+        <div class="video-card" data-video="2">
+          <div class="video-thumbnail">
+            <span class="video-badge">Free</span>
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="video-info">
+            <h3>Solving Complex Equations</h3>
+            <p>Master advanced algebraic techniques and learn strategic approaches to tackle ISI's toughest equation problems.</p>
+            <div class="video-meta">
+              <span>⏱️ 38 min</span>
+              <span>📊 Intermediate</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video 3 - Locked -->
+        <div class="video-card" data-video="3">
+          <div class="video-thumbnail">
+            <span class="video-badge locked">🔒 Premium</span>
+            <div class="play-icon">🔒</div>
+          </div>
+          <div class="video-info">
+            <h3>Calculus Masterclass</h3>
+            <p>Deep dive into limits, continuity, differentiation, and integration with ISI-specific problem-solving strategies.</p>
+            <div class="video-meta">
+              <span>⏱️ 52 min</span>
+              <span>📊 Advanced</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Video Player Modal -->
+  <div class="video-modal" id="videoModal">
+    <div class="video-modal-content">
+      <button class="close-video" id="closeVideo">&times;</button>
+      <video class="video-player" id="videoPlayer" controls>
+        <source src="" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+
+  <!-- Purchase Modal -->
+  <div class="purchase-modal" id="purchaseModal">
+    <div class="purchase-content">
+      <button class="close-purchase" id="closePurchase">&times;</button>
+      <div class="icon">🎓</div>
+      <h2>Unlock Complete Course Access</h2>
+      <p>Get lifetime access to 450+ hours of premium content, 5000+ practice problems, live doubt sessions, and personal mentorship from ISI experts.</p>
+      
+      <div class="price-tag">
+        <div class="original-price">₹49,999</div>
+        <div class="discounted-price">₹29,999</div>
+        <small style="color: var(--primary); font-weight: 600;">Limited Time Offer - Save 40%</small>
+      </div>
+
+      <div class="purchase-buttons">
+        <button class="btn btn-primary" id="proceedToPay">
+          💳 Proceed to Payment
+        </button>
+        <button class="btn btn-secondary" id="learnMore">
+          📖 Learn More About Course
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Demo video URLs (replace with actual video URLs)
+    const videos = {
+      1: 'https://www.w3schools.com/html/mov_bbb.mp4', // Replace with actual video
+      2: 'https://www.w3schools.com/html/movie.mp4',   // Replace with actual video
+      3: null // Locked video
+    };
+
+    const videoCards = document.querySelectorAll('.video-card');
+    const videoModal = document.getElementById('videoModal');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const closeVideo = document.getElementById('closeVideo');
+    const purchaseModal = document.getElementById('purchaseModal');
+    const closePurchase = document.getElementById('closePurchase');
+    const proceedToPay = document.getElementById('proceedToPay');
+    const learnMore = document.getElementById('learnMore');
+
+    // Video card click handlers
+    videoCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const videoNum = card.dataset.video;
+        
+        if (videoNum === '3') {
+          // Show purchase modal for locked video
+          purchaseModal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        } else {
+          // Play free videos
+          videoPlayer.src = videos[videoNum];
+          videoModal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+          videoPlayer.play();
+        }
+      });
+    });
+
+    // Close video modal
+    closeVideo.addEventListener('click', () => {
+      videoModal.classList.remove('active');
+      videoPlayer.pause();
+      videoPlayer.src = '';
+      document.body.style.overflow = 'auto';
+    });
+
+    // Close purchase modal
+    closePurchase.addEventListener('click', () => {
+      purchaseModal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    });
+
+    // Proceed to payment
+    proceedToPay.addEventListener('click', () => {
+      // Replace this URL with your actual payment gateway URL
+      alert('Redirecting to payment gateway...\n\nIn production, this would redirect to your payment processor (Razorpay, Stripe, etc.)');
+      
+      // Example: window.location.href = 'https://your-payment-gateway.com/checkout';
+      
+      // For demo purposes, you could redirect to a contact form or WhatsApp
+      // window.open('https://wa.me/1234567890?text=I want to enroll in ISI Coaching', '_blank');
+    });
+
+    // Learn more button
+    learnMore.addEventListener('click', () => {
+      purchaseModal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+      
+      // Scroll to description section
+      document.querySelector('.coaching-description').scrollIntoView({ 
+        behavior: 'smooth' 
+      });
+    });
+
+    // Close modals on outside click
+    videoModal.addEventListener('click', (e) => {
+      if (e.target === videoModal) {
+        closeVideo.click();
+      }
+    });
+
+    purchaseModal.addEventListener('click', (e) => {
+      if (e.target === purchaseModal) {
+        closePurchase.click();
+      }
+    });
+
+    // Close modals on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (videoModal.classList.contains('active')) {
+          closeVideo.click();
+        }
+        if (purchaseModal.classList.contains('active')) {
+          closePurchase.click();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
