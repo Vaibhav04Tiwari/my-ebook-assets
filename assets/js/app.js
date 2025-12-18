@@ -1,5 +1,5 @@
 // app.js - Academic Portal with Google Authentication & Silent Download
-// Version: 5.0 - Smooth UX with Background Download
+// Version: 5.1 - Added ISI Coaching Navigation
 
 // ==================== CONFIGURATION ====================
 class Config {
@@ -27,6 +27,7 @@ class NavigationManager {
       'home': document.getElementById('main-book'),
       'author': document.getElementById('author-section'),
       'solutions': document.getElementById('solutions-section'),
+      'coaching': document.getElementById('coaching-section'),
       'terms': document.getElementById('terms-section')
     };
     this.heroSection = document.getElementById('home-section');
@@ -581,6 +582,7 @@ class Header extends PageComponent {
           <a href="#home" class="nav-link active" data-section="home">Home</a>
           <a href="#author" class="nav-link" data-section="author">Author</a>
           <a href="#solutions" class="nav-link" data-section="solutions">Solution Book</a>
+          <a href="#coaching" class="nav-link" data-section="coaching">ISI Coaching</a>
         </nav>
       </div>
     `;
@@ -738,6 +740,7 @@ class AcademicPortalApp {
       const accessBtn = document.getElementById('access-ebook-btn');
       const solutionsBtn = document.getElementById('solutions-btn');
       const solutionsBtn2 = document.getElementById('solutions-btn-2');
+      const coachingBtn = document.getElementById('coaching-btn');
       
       if (accessBtn) {
         console.log('✅ Download E-Book button found');
@@ -750,6 +753,10 @@ class AcademicPortalApp {
       
       if (solutionsBtn2) {
         solutionsBtn2.addEventListener('click', () => this.handleSolutionsClick());
+      }
+
+      if (coachingBtn) {
+        coachingBtn.addEventListener('click', () => this.handleCoachingClick());
       }
       
       const logo = document.querySelector('.logo');
@@ -839,6 +846,11 @@ class AcademicPortalApp {
   handleSolutionsClick() {
     console.log('🛒 Redirecting to Amazon for Solutions');
     window.open(Config.SOLUTION_LINK, '_blank');
+  }
+
+  handleCoachingClick() {
+    console.log('🎓 Redirecting to ISI Coaching page');
+    window.location.href = Config.COACHING_PAGE_URL;
   }
 }
 
