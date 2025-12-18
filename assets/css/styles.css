@@ -1039,3 +1039,43 @@ body {
     font-size: 1.6rem;
   }
 }
+/* Enhanced Footer Styles - Add this to your existing styles.css */
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-section {
+  display: flex;
+  align-items: center;
+}
+
+.footer-section p {
+  margin: 0;
+}
+
+.footer-section a:hover {
+  color: #c1e5d0 !important;
+  text-decoration: underline;
+}
+
+/* Mobile responsive footer */
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .footer-section {
+    justify-content: center;
+  }
+}

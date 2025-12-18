@@ -596,9 +596,21 @@ class Footer extends PageComponent {
   render() {
     const content = `
       <div class="footer-content">
-        <div class="footer-section" style="max-width: 600px; margin: 0 auto; text-align: center;">
-          <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">
-            <a href="#terms" data-section="terms" style="color: #4CAF50; text-decoration: none; font-weight: 500;">Terms & Conditions</a>
+        <div class="footer-section">
+          <p style="font-size: 0.9rem;">
+            <a href="#terms" data-section="terms" style="color: #a7d5ba; text-decoration: none; font-weight: 500;">Terms & Conditions</a>
+          </p>
+        </div>
+        <div class="footer-section">
+          <p style="font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>📧</span>
+            <a href="mailto:thebanyantreebook@gmail.com" style="color: #a7d5ba; text-decoration: none;">thebanyantreebook@gmail.com</a>
+          </p>
+        </div>
+        <div class="footer-section">
+          <p style="font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.2rem;">🎥</span>
+            <a href="https://www.youtube.com/@TheBanyanTreeCoaching" target="_blank" rel="noopener noreferrer" style="color: #a7d5ba; text-decoration: none;">YouTube Channel</a>
           </p>
         </div>
       </div>

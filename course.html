@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ISI Coaching - Under the Banyan Tree</title>
+  <title>ISI Mock Tests - Under the Banyan Tree</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap');
 
@@ -137,7 +137,7 @@
     .coaching-header h1 {
       font-family: 'Merriweather', Georgia, serif;
       font-size: 2.5rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       letter-spacing: -0.02em;
     }
 
@@ -156,85 +156,83 @@
       padding: 3rem 2rem;
     }
 
-    /* Description Section */
-    .coaching-description {
-      background: var(--bg-card);
-      border-radius: 12px;
-      padding: 2.5rem;
-      margin-bottom: 3rem;
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .coaching-description h2 {
-      font-family: 'Merriweather', Georgia, serif;
-      color: var(--primary);
-      font-size: 1.75rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .coaching-description p {
-      color: var(--text-medium);
-      line-height: 1.8;
-      margin-bottom: 1rem;
-      font-size: 1rem;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-
-    .feature-card {
-      background: var(--accent-light);
-      padding: 1.5rem;
-      border-radius: 8px;
-      border-left: 4px solid var(--primary);
-    }
-
-    .feature-card h3 {
-      color: var(--primary);
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
+    /* Program Tabs */
+    .program-tabs {
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .feature-card p {
-      color: var(--text-medium);
-      font-size: 0.95rem;
-    }
-
-    /* Demo Videos Section */
-    .demo-section {
+      justify-content: center;
+      gap: 1rem;
       margin-bottom: 3rem;
     }
 
-    .demo-section h2 {
+    .tab-btn {
+      padding: 1rem 2.5rem;
+      background: white;
+      color: var(--text-medium);
+      border: 2px solid var(--border-medium);
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: var(--accent-light);
+      border-color: var(--primary);
+    }
+
+    /* Mock Tests Section */
+    .tests-section {
+      display: none;
+    }
+
+    .tests-section.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .section-header h2 {
       font-family: 'Merriweather', Georgia, serif;
       color: var(--primary);
       font-size: 2rem;
       margin-bottom: 0.5rem;
-      text-align: center;
     }
 
-    .demo-section .subtitle {
-      text-align: center;
+    .section-header p {
       color: var(--text-medium);
-      margin-bottom: 2.5rem;
       font-size: 1.05rem;
     }
 
-    .videos-grid {
+    .tests-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 2rem;
     }
 
-    .video-card {
+    .test-card {
       background: var(--bg-card);
       border-radius: 12px;
       overflow: hidden;
@@ -245,57 +243,27 @@
       position: relative;
     }
 
-    .video-card:hover {
+    .test-card:hover {
       transform: translateY(-5px);
       box-shadow: var(--shadow-lg);
     }
 
-    .video-thumbnail {
+    .test-header {
       position: relative;
-      width: 100%;
-      height: 200px;
+      padding: 2rem;
       background: linear-gradient(135deg, #e8f4ed 0%, #d1e8d9 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      text-align: center;
     }
 
-    .video-thumbnail::before {
-      content: '';
+    .test-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .test-badge {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(45deg, rgba(47, 93, 63, 0.1) 0%, rgba(90, 125, 103, 0.1) 100%);
-    }
-
-    .play-icon {
-      width: 60px;
-      height: 60px;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      color: var(--primary);
-      z-index: 1;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .video-card:hover .play-icon {
-      transform: scale(1.1);
-      background: var(--primary);
-      color: white;
-    }
-
-    .video-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
+      top: 15px;
+      right: 15px;
       background: var(--primary);
       color: white;
       padding: 0.4rem 0.8rem;
@@ -303,106 +271,69 @@
       font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
-      z-index: 2;
       box-shadow: var(--shadow-md);
     }
 
-    .video-badge.locked {
+    .test-badge.locked {
       background: var(--accent-gold);
       color: var(--text-dark);
     }
 
-    .video-info {
+    .test-info {
       padding: 1.5rem;
     }
 
-    .video-info h3 {
+    .test-info h3 {
       color: var(--text-dark);
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
       font-weight: 600;
     }
 
-    .video-info p {
+    .test-info p {
       color: var(--text-medium);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       line-height: 1.6;
+      margin-bottom: 1rem;
     }
 
-    .video-meta {
+    .test-meta {
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
       gap: 1rem;
-      margin-top: 1rem;
       padding-top: 1rem;
       border-top: 1px solid var(--border-subtle);
       font-size: 0.85rem;
       color: var(--text-light);
     }
 
-    .video-meta span {
+    .test-meta span {
       display: flex;
       align-items: center;
       gap: 0.3rem;
     }
 
-    /* Video Player Modal */
-    .video-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
+    .test-btn {
       width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.95);
-      z-index: 9999;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .video-modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .video-modal-content {
-      position: relative;
-      width: 90%;
-      max-width: 900px;
-      background: #000;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    }
-
-    .video-player {
-      width: 100%;
-      aspect-ratio: 16/9;
-      background: #000;
-    }
-
-    .close-video {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
+      padding: 0.9rem;
+      background: var(--primary);
       color: white;
-      font-size: 2rem;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.95rem;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      z-index: 10;
+      transition: all 0.2s ease;
+      margin-top: 1rem;
     }
 
-    .close-video:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: rotate(90deg);
+    .test-btn:hover {
+      background: var(--primary-hover);
+    }
+
+    .test-btn.locked {
+      background: var(--accent-gold);
+      color: var(--text-dark);
     }
 
     /* Purchase Modal */
@@ -416,13 +347,18 @@
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(8px);
       z-index: 10000;
-      animation: fadeIn 0.3s ease;
+      animation: fadeInModal 0.3s ease;
     }
 
     .purchase-modal.active {
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    @keyframes fadeInModal {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .purchase-content {
@@ -435,11 +371,6 @@
       text-align: center;
       position: relative;
       animation: slideUp 0.4s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
     }
 
     @keyframes slideUp {
@@ -582,21 +513,23 @@
         padding: 2rem 1rem;
       }
 
-      .coaching-description {
-        padding: 1.5rem;
+      .program-tabs {
+        flex-direction: column;
+        gap: 0.75rem;
       }
 
-      .videos-grid {
+      .tab-btn {
+        padding: 0.9rem 1.5rem;
+        font-size: 1rem;
+      }
+
+      .tests-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
       }
 
       .purchase-content {
         padding: 2rem 1.5rem;
-      }
-
-      .video-modal-content {
-        width: 95%;
       }
     }
   </style>
@@ -609,7 +542,7 @@
         <span>←</span>
         <span>Back to Home</span>
       </a>
-      <div class="page-title">ISI Coaching Program</div>
+      <div class="page-title">ISI Mock Tests</div>
     </div>
     <div class="nav-right">
       <div class="user-info" id="userInfo">
@@ -626,115 +559,178 @@
   <!-- Header -->
   <header class="coaching-header">
     <h1>🎓 ISI COACHING</h1>
-    <p>Master the Indian Statistical Institute Entrance Exam with Expert Guidance and Comprehensive Learning Resources</p>
+    <p>B.Stat and M.Stat</p>
   </header>
 
   <!-- Main Container -->
   <div class="coaching-container">
-    <!-- Description Section -->
-    <section class="coaching-description">
-      <h2>Transform Your ISI Dream into Reality</h2>
-      <p>
-        Welcome to India's premier ISI coaching program, designed specifically for students aspiring to crack the prestigious Indian Statistical Institute entrance examination. Our comprehensive program combines decades of teaching expertise with modern pedagogical methods to ensure your success.
-      </p>
-      <p>
-        Whether you're targeting the B.Math, B.Stat, M.Math, or M.Stat programs, our meticulously crafted curriculum covers every aspect of the ISI syllabus with depth and clarity. We don't just teach concepts; we build problem-solving intuition that lasts a lifetime.
-      </p>
-
-      <div class="features-grid">
-        <div class="feature-card">
-          <h3>📚 Complete Curriculum</h3>
-          <p>450+ hours of structured content covering Number Theory, Algebra, Calculus, Probability, and Statistics</p>
-        </div>
-        <div class="feature-card">
-          <h3>👨‍🏫 Expert Faculty</h3>
-          <p>Learn from ISI alumni and mathematicians with proven track records of producing top rankers</p>
-        </div>
-        <div class="feature-card">
-          <h3>📝 Practice Materials</h3>
-          <p>5000+ problems with detailed solutions, including past 25 years of ISI papers</p>
-        </div>
-        <div class="feature-card">
-          <h3>🎯 Personalized Guidance</h3>
-          <p>One-on-one doubt clearing sessions and customized study plans based on your strengths</p>
-        </div>
-        <div class="feature-card">
-          <h3>🏆 Proven Results</h3>
-          <p>85% success rate with students securing top 100 ranks in ISI entrance examinations</p>
-        </div>
-        <div class="feature-card">
-          <h3>💻 Online & Offline</h3>
-          <p>Flexible learning modes with live classes, recorded lectures, and interactive doubt sessions</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Demo Videos Section -->
-    <section class="demo-section">
-      <h2>🎬 Free Demo Lectures</h2>
-      <p class="subtitle">Experience our teaching methodology with these free introductory sessions</p>
-
-      <div class="videos-grid">
-        <!-- Video 1 - Free -->
-        <div class="video-card" data-video="1">
-          <div class="video-thumbnail">
-            <span class="video-badge">Free</span>
-            <div class="play-icon">▶</div>
-          </div>
-          <div class="video-info">
-            <h3>Introduction to Number Theory</h3>
-            <p>Discover the fundamentals of divisibility, prime numbers, and modular arithmetic with practical examples from ISI papers.</p>
-            <div class="video-meta">
-              <span>⏱️ 45 min</span>
-              <span>📊 Beginner</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Video 2 - Free -->
-        <div class="video-card" data-video="2">
-          <div class="video-thumbnail">
-            <span class="video-badge">Free</span>
-            <div class="play-icon">▶</div>
-          </div>
-          <div class="video-info">
-            <h3>Solving Complex Equations</h3>
-            <p>Master advanced algebraic techniques and learn strategic approaches to tackle ISI's toughest equation problems.</p>
-            <div class="video-meta">
-              <span>⏱️ 38 min</span>
-              <span>📊 Intermediate</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Video 3 - Locked -->
-        <div class="video-card" data-video="3">
-          <div class="video-thumbnail">
-            <span class="video-badge locked">🔒 Premium</span>
-            <div class="play-icon">🔒</div>
-          </div>
-          <div class="video-info">
-            <h3>Calculus Masterclass</h3>
-            <p>Deep dive into limits, continuity, differentiation, and integration with ISI-specific problem-solving strategies.</p>
-            <div class="video-meta">
-              <span>⏱️ 52 min</span>
-              <span>📊 Advanced</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Video Player Modal -->
-  <div class="video-modal" id="videoModal">
-    <div class="video-modal-content">
-      <button class="close-video" id="closeVideo">&times;</button>
-      <video class="video-player" id="videoPlayer" controls>
-        <source src="" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
+    <!-- Program Tabs -->
+    <div class="program-tabs">
+      <button class="tab-btn active" data-program="bstat">B.Stat</button>
+      <button class="tab-btn" data-program="mstat">M.Stat</button>
     </div>
+
+    <!-- B.Stat Tests Section -->
+    <section class="tests-section active" id="bstat-section">
+      <div class="section-header">
+        <h2>B.Stat Mock Tests</h2>
+      </div>
+
+      <div class="tests-grid">
+        <!-- Test 1 - Free -->
+        <div class="test-card" data-test="bstat-1">
+          <div class="test-header">
+            <span class="test-badge">Free</span>
+            <div class="test-icon">📄</div>
+          </div>
+          <div class="test-info">
+            <h3>Mock Test 1</h3>
+            <p>Foundation level test covering basic concepts in Mathematics and Statistics</p>
+            <div class="test-meta">
+              <span>⏱️ 2 hours</span>
+              <span>📊 30 questions</span>
+              <span>🎯 Beginner</span>
+            </div>
+            <button class="test-btn">Start Test</button>
+          </div>
+        </div>
+
+        <!-- Test 2 - Free -->
+        <div class="test-card" data-test="bstat-2">
+          <div class="test-header">
+            <span class="test-badge">Free</span>
+            <div class="test-icon">📄</div>
+          </div>
+          <div class="test-info">
+            <h3>Mock Test 2</h3>
+            <p>Intermediate level test with mixed difficulty problems</p>
+            <div class="test-meta">
+              <span>⏱️ 2 hours</span>
+              <span>📊 30 questions</span>
+              <span>🎯 Intermediate</span>
+            </div>
+            <button class="test-btn">Start Test</button>
+          </div>
+        </div>
+
+        <!-- Test 3 - Locked -->
+        <div class="test-card" data-test="bstat-3">
+          <div class="test-header">
+            <span class="test-badge locked">🔒 Premium</span>
+            <div class="test-icon">📄</div>
+          </div>
+          <div class="test-info">
+            <h3>Mock Test 3</h3>
+            <p>Advanced level test simulating actual ISI exam difficulty</p>
+            <div class="test-meta">
+              <span>⏱️ 2 hours</span>
+              <span>📊 30 questions</span>
+              <span>🎯 Advanced</span>
+            </div>
+            <button class="test-btn locked">🔒 Unlock Premium</button>
+          </div>
+        </div>
+
+        <!-- Test 4 - Locked -->
+        <div class="test-card" data-test="bstat-4">
+          <div class="test-header">
+            <span class="test-badge locked">🔒 Premium</span>
+            <div class="test-icon">📄</div>
+          </div>
+          <div class="test-info">
+            <h3>Mock Test 4</h3>
+            <p>Full-length test with detailed solutions and performance analysis</p>
+            <div class="test-meta">
+              <span>⏱️ 2 hours</span>
+              <span>📊 30 questions</span>
+              <span>🎯 Advanced</span>
+            </div>
+            <button class="test-btn locked">🔒 Unlock Premium</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- M.Stat Tests Section -->
+    <section class="tests-section" id="mstat-section">
+      <div class="section-header">
+        <h2>M.Stat Mock Tests</h2>
+      </div>
+
+      <div class="tests-grid">
+        <!-- Test 1 - Free -->
+        <div class="test-card" data-test="mstat-1">
+          <div class="test-header">
+            <span class="test-badge">Free</span>
+            <div class="test-icon">📄</div>
+          </div>
+          <div class="test-info">
+            <h3>Mock Test 1</h3>
+            <p>Foundation level test covering probability and mathematical statistics</p>
+            <div class="test-meta">
+              <span>⏱️ 2 hours</span>
+              <span>📊 30 questions</span>
+              <span>🎯 Beginner</span>
+            </div>
+            <button class="test-btn">Start Test</button>
+          </div>
+        </div>
+
+        <!-- Test 2 - Free -->
+        <div class="test-card" data-test="mstat-2">
+          <div class="test-header">
+            <span class="test-badge">Free</span>
+            <div class="test-icon">📄</div>
+          </div>
+          <div class="test-info">
+            <h3>Mock Test 2</h3>
+            <p>Intermediate level test with linear algebra and real analysis</p>
+            <div class="test-meta">
+              <span>⏱️ 2 hours</span>
+              <span>📊 30 questions</span>
+              <span>🎯 Intermediate</span>
+            </div>
+            <button class="test-btn">Start Test</button>
+          </div>
+        </div>
+
+        <!-- Test 3 - Locked -->
+        <div class="test-card" data-test="mstat-3">
+          <div class="test-header">
+            <span class="test-badge locked">🔒 Premium</span>
+            <div class="test-icon">📄</div>
+          </div>
+          <div class="test-info">
+            <h3>Mock Test 3</h3>
+            <p>Advanced level test simulating actual ISI exam difficulty</p>
+            <div class="test-meta">
+              <span>⏱️ 2 hours</span>
+              <span>📊 30 questions</span>
+              <span>🎯 Advanced</span>
+            </div>
+            <button class="test-btn locked">🔒 Unlock Premium</button>
+          </div>
+        </div>
+
+        <!-- Test 4 - Locked -->
+        <div class="test-card" data-test="mstat-4">
+          <div class="test-header">
+            <span class="test-badge locked">🔒 Premium</span>
+            <div class="test-icon">📄</div>
+          </div>
+          <div class="test-info">
+            <h3>Mock Test 4</h3>
+            <p>Full-length test with comprehensive solutions and analytics</p>
+            <div class="test-meta">
+              <span>⏱️ 2 hours</span>
+              <span>📊 30 questions</span>
+              <span>🎯 Advanced</span>
+            </div>
+            <button class="test-btn locked">🔒 Unlock Premium</button>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <!-- Purchase Modal -->
@@ -742,12 +738,12 @@
     <div class="purchase-content">
       <button class="close-purchase" id="closePurchase">&times;</button>
       <div class="icon">🎓</div>
-      <h2>Unlock Complete Course Access</h2>
-      <p>Get lifetime access to 450+ hours of premium content, 5000+ practice problems, live doubt sessions, and personal mentorship from ISI experts.</p>
+      <h2>Unlock All Mock Tests</h2>
+      <p>Get unlimited access to all premium mock tests with detailed solutions, performance analytics, and personalized feedback.</p>
       
       <div class="price-tag">
-        <div class="original-price">₹49,999</div>
-        <div class="discounted-price">₹29,999</div>
+        <div class="original-price">₹4,999</div>
+        <div class="discounted-price">₹2,999</div>
         <small style="color: var(--primary); font-weight: 600;">Limited Time Offer - Save 40%</small>
       </div>
 
@@ -755,8 +751,8 @@
         <button class="btn btn-primary" id="proceedToPay">
           💳 Proceed to Payment
         </button>
-        <button class="btn btn-secondary" id="learnMore">
-          📖 Learn More About Course
+        <button class="btn btn-secondary" id="closePurchaseBtn">
+          Cancel
         </button>
       </div>
     </div>
@@ -770,7 +766,6 @@
       
       if (idToken) {
         try {
-          // Decode JWT token to get user info (basic decode, not verification)
           const base64Url = idToken.split('.')[1];
           const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
           const payload = JSON.parse(window.atob(base64));
@@ -791,10 +786,7 @@
         localStorage.removeItem('idToken');
         localStorage.removeItem('downloadIntent');
         
-        // Show notification
         alert('✅ You have been signed out successfully!');
-        
-        // Redirect to home page
         window.location.href = 'index.html';
       }
     });
@@ -802,45 +794,44 @@
     // Initialize auth check
     checkAuth();
 
-    // Demo video URLs (replace with actual video URLs)
-    const videos = {
-      1: 'https://www.w3schools.com/html/mov_bbb.mp4',
-      2: 'https://www.w3schools.com/html/movie.mp4',
-      3: null // Locked video
-    };
+    // Tab switching
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const testsSections = document.querySelectorAll('.tests-section');
 
-    const videoCards = document.querySelectorAll('.video-card');
-    const videoModal = document.getElementById('videoModal');
-    const videoPlayer = document.getElementById('videoPlayer');
-    const closeVideo = document.getElementById('closeVideo');
-    const purchaseModal = document.getElementById('purchaseModal');
-    const closePurchase = document.getElementById('closePurchase');
-    const proceedToPay = document.getElementById('proceedToPay');
-    const learnMore = document.getElementById('learnMore');
-
-    // Video card click handlers
-    videoCards.forEach(card => {
-      card.addEventListener('click', () => {
-        const videoNum = card.dataset.video;
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active class from all tabs
+        tabBtns.forEach(b => b.classList.remove('active'));
+        testsSections.forEach(s => s.classList.remove('active'));
         
-        if (videoNum === '3') {
-          purchaseModal.classList.add('active');
-          document.body.style.overflow = 'hidden';
-        } else {
-          videoPlayer.src = videos[videoNum];
-          videoModal.classList.add('active');
-          document.body.style.overflow = 'hidden';
-          videoPlayer.play();
-        }
+        // Add active class to clicked tab
+        btn.classList.add('active');
+        const program = btn.dataset.program;
+        document.getElementById(`${program}-section`).classList.add('active');
       });
     });
 
-    // Close video modal
-    closeVideo.addEventListener('click', () => {
-      videoModal.classList.remove('active');
-      videoPlayer.pause();
-      videoPlayer.src = '';
-      document.body.style.overflow = 'auto';
+    // Test card click handlers
+    const testCards = document.querySelectorAll('.test-card');
+    const purchaseModal = document.getElementById('purchaseModal');
+    const closePurchase = document.getElementById('closePurchase');
+    const closePurchaseBtn = document.getElementById('closePurchaseBtn');
+    const proceedToPay = document.getElementById('proceedToPay');
+
+    testCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const testId = card.dataset.test;
+        const isLocked = card.querySelector('.test-badge.locked');
+        
+        if (isLocked) {
+          // Show purchase modal for locked tests
+          purchaseModal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        } else {
+          // Start free test
+          alert(`Starting ${testId}...\n\nThis would launch the test interface in production.`);
+        }
+      });
     });
 
     // Close purchase modal
@@ -849,42 +840,27 @@
       document.body.style.overflow = 'auto';
     });
 
-    // Proceed to payment
-    proceedToPay.addEventListener('click', () => {
-      alert('Redirecting to payment gateway...\n\nIn production, this would redirect to your payment processor (Razorpay, Stripe, etc.)');
-    });
-
-    // Learn more button
-    learnMore.addEventListener('click', () => {
+    closePurchaseBtn.addEventListener('click', () => {
       purchaseModal.classList.remove('active');
       document.body.style.overflow = 'auto';
-      document.querySelector('.coaching-description').scrollIntoView({ 
-        behavior: 'smooth' 
-      });
     });
 
-    // Close modals on outside click
-    videoModal.addEventListener('click', (e) => {
-      if (e.target === videoModal) {
-        closeVideo.click();
-      }
+    // Proceed to payment
+    proceedToPay.addEventListener('click', () => {
+      alert('Redirecting to payment gateway...\n\nIn production, this would redirect to Razorpay/Stripe.');
     });
 
+    // Close modal on outside click
     purchaseModal.addEventListener('click', (e) => {
       if (e.target === purchaseModal) {
         closePurchase.click();
       }
     });
 
-    // Close modals on Escape key
+    // Close modal on Escape key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        if (videoModal.classList.contains('active')) {
-          closeVideo.click();
-        }
-        if (purchaseModal.classList.contains('active')) {
-          closePurchase.click();
-        }
+      if (e.key === 'Escape' && purchaseModal.classList.contains('active')) {
+        closePurchase.click();
       }
     });
   </script>
