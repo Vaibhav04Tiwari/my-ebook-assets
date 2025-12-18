@@ -1,5 +1,5 @@
-// app.js - Academic Portal with Google Authentication & Course Redirect
-// Version: 4.0 - Fixed Authentication Flow
+// app.js - Academic Portal with Google Authentication & Silent Download
+// Version: 5.0 - Smooth UX with Background Download
 
 // ==================== CONFIGURATION ====================
 class Config {
@@ -131,8 +131,6 @@ class AuthenticationManager {
     const authUrl = `${this.config.cognitoDomain}/oauth2/authorize?${params.toString()}`;
     
     console.log('🔐 Starting Google OAuth Flow');
-    console.log('📍 Redirect URI:', redirectUri);
-    console.log('🔗 Auth URL:', authUrl);
     
     // Set flag that user wants to download ebook
     localStorage.setItem('downloadIntent', 'ebook');
@@ -147,8 +145,6 @@ class AuthenticationManager {
     
     if (error) {
       console.error('❌ OAuth Error:', error);
-      const errorDesc = urlParams.get('error_description');
-      if (errorDesc) console.error('Error Description:', errorDesc);
       localStorage.removeItem('downloadIntent');
       return false;
     }
@@ -164,7 +160,6 @@ class AuthenticationManager {
     
     try {
       console.log('🔄 Exchanging code for tokens...');
-      console.log('📍 Using redirect URI:', redirectUri);
       
       const response = await fetch(`${this.config.cognitoDomain}/oauth2/token`, {
         method: 'POST',
@@ -183,7 +178,6 @@ class AuthenticationManager {
       
       if (!response.ok) {
         console.error('❌ Token exchange failed:', response.status);
-        console.error('Response:', responseData);
         localStorage.removeItem('downloadIntent');
         return false;
       }
@@ -200,7 +194,6 @@ class AuthenticationManager {
       }
       
       console.error('❌ No access token in response');
-      console.error('Response:', responseData);
       localStorage.removeItem('downloadIntent');
       return false;
       
@@ -272,7 +265,7 @@ class DownloadManager {
       const link = document.createElement('a');
       link.href = this.fileConfig.url;
       link.download = this.fileConfig.filename;
-      link.target = '_blank'; // Open in new tab if download doesn't work
+      link.target = '_blank';
       link.rel = 'noopener noreferrer';
       link.style.display = 'none';
       
@@ -295,11 +288,10 @@ class UIManager {
     this.modals = [];
   }
   
-  showLoadingModal() {
-    const modal = new LoadingModal();
-    modal.show();
-    this.modals.push(modal);
-    return modal;
+  showDownloadingNotification() {
+    const notification = new DownloadingNotification();
+    notification.show();
+    return notification;
   }
   
   showSuccessNotification(title, message) {
@@ -354,17 +346,101 @@ class Modal {
   }
 }
 
-class LoadingModal extends Modal {
+class DownloadingNotification {
   constructor() {
-    super();
-    const content = `
-      <div class="auth-modal-content loading-content">
-        <div class="loading-spinner"></div>
-        <h3>Processing...</h3>
-        <p>Please wait while we prepare your download</p>
+    this.element = null;
+  }
+  
+  show() {
+    this.element = document.createElement('div');
+    this.element.className = 'downloading-notification';
+    this.element.innerHTML = `
+      <div class="notification-content">
+        <div class="download-spinner"></div>
+        <div class="notification-text">
+          <h4>📥 Downloading Your E-Book</h4>
+          <p>Your download will start shortly...</p>
+        </div>
       </div>
     `;
-    this.create(content);
+    document.body.appendChild(this.element);
+    
+    // Add styles dynamically
+    if (!document.getElementById('download-notification-styles')) {
+      const style = document.createElement('style');
+      style.id = 'download-notification-styles';
+      style.textContent = `
+        .downloading-notification {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: white;
+          padding: 2rem 3rem;
+          border-radius: 12px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+          z-index: 10001;
+          animation: fadeInScale 0.3s ease;
+        }
+        
+        @keyframes fadeInScale {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+        
+        .downloading-notification .notification-content {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+        }
+        
+        .download-spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #2f5d3f;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        .downloading-notification h4 {
+          color: #1f2937;
+          margin-bottom: 0.3rem;
+          font-size: 1.1rem;
+        }
+        
+        .downloading-notification p {
+          color: #6b7280;
+          margin: 0;
+          font-size: 0.9rem;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }
+  
+  remove() {
+    if (this.element && this.element.parentNode) {
+      this.element.style.opacity = '0';
+      this.element.style.transform = 'translate(-50%, -50%) scale(0.9)';
+      this.element.style.transition = 'all 0.3s ease';
+      setTimeout(() => {
+        if (this.element && this.element.parentNode) {
+          this.element.parentNode.removeChild(this.element);
+        }
+      }, 300);
+    }
   }
 }
 
@@ -620,7 +696,7 @@ class AcademicPortalApp {
         localStorage.removeItem('downloadIntent');
         
         // Trigger download and redirect immediately
-        this.downloadEbookAndRedirect();
+        await this.downloadEbookAndRedirect();
         
         return; // Don't setup event listeners since we're redirecting
       }
@@ -654,8 +730,6 @@ class AcademicPortalApp {
       if (accessBtn) {
         console.log('✅ Download E-Book button found');
         accessBtn.addEventListener('click', () => this.handleEbookClick());
-      } else {
-        console.error('❌ Download E-Book button NOT found!');
       }
       
       if (solutionsBtn) {
@@ -681,17 +755,6 @@ class AcademicPortalApp {
         });
       }
       
-      // Debug helper
-      window.debugAuth = () => {
-        console.log('=== AUTH DEBUG INFO ===');
-        console.log('Access Token:', localStorage.getItem('accessToken'));
-        console.log('ID Token:', localStorage.getItem('idToken'));
-        console.log('Download Intent:', localStorage.getItem('downloadIntent'));
-        console.log('Is Authenticated:', this.authManager.isAuthenticated());
-        console.log('======================');
-      };
-      console.log('💡 Tip: Run debugAuth() in console for auth info');
-      
     }, 300);
   }
   
@@ -716,30 +779,47 @@ class AcademicPortalApp {
   async downloadEbookAndRedirect() {
     console.log('📥 ========== DOWNLOAD & REDIRECT START ==========');
     
+    // Show downloading notification
+    const notification = this.uiManager.showDownloadingNotification();
+    
     try {
       // Start download silently in background
       console.log('📥 Starting background download...');
       await this.ebookDownloadManager.startDownload();
       console.log('✅ Download triggered successfully');
       
-      // Small delay to ensure download starts before redirect
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait a bit for download to initiate
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Show alert
-      console.log('📢 Showing download notification...');
-      alert('📚 Your e-book is downloading!\n\nClick OK to view our ISI Coaching program.');
+      // Remove notification
+      notification.remove();
       
-      // Redirect immediately after user clicks OK
+      // Show success message briefly
+      this.uiManager.showSuccessNotification(
+        '✅ Download Started!',
+        'Check your downloads folder'
+      );
+      
+      // Wait a bit before redirect
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Redirect to course page
       console.log('🚀 Redirecting to course page...');
-      console.log('📍 Target URL:', Config.COACHING_PAGE_URL);
-      
       window.location.href = Config.COACHING_PAGE_URL;
       
     } catch (error) {
       console.error('❌ Error in download/redirect process:', error);
       
-      // Even if download fails, still show alert and redirect
-      alert('📚 Preparing your e-book...\n\nClick OK to view our ISI Coaching program.');
+      // Remove notification
+      notification.remove();
+      
+      // Still redirect even if download fails
+      this.uiManager.showSuccessNotification(
+        '📚 Preparing E-Book',
+        'Redirecting to course page...'
+      );
+      
+      await new Promise(resolve => setTimeout(resolve, 1500));
       window.location.href = Config.COACHING_PAGE_URL;
     }
   }
