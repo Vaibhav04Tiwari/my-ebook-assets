@@ -918,14 +918,13 @@ body {
   box-shadow: none;
   margin: 0;
 }
-
 #mock-tests-iframe {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   border: none;
   display: block;
-  background: white;
 }
+
 
 /* Responsive Design */
 @media (max-width: 900px) {
