@@ -1203,7 +1203,7 @@ class BookCard {
           <div>
             <h2>Under the Banyan Tree<span>Decoding Numbers</span></h2>
             <div class="meta-data">Author: Sumit Gupta | Pages: 450+ | Subject: Mathematics</div>
-            <p>Comprehensive number theory textbook for ISI entrance preparation.</p>
+            <p>This comprehensive textbook provides an in-depth exploration of number theory concepts, specifically designed for ISI entrance examination preparation. It covers fundamental principles, advanced problem-solving techniques, and includes detailed solutions to help students master complex mathematical concepts.</p>
           </div>
           <div class="actions">
             <button id="access-ebook-btn" class="btn btn--secondary">
