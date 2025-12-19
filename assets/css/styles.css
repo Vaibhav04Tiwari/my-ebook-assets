@@ -1078,4 +1078,16 @@ body {
   .footer-section {
     justify-content: center;
   }
+}#mock-tests-section .section-card {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+#mock-tests-iframe {
+  width: 100%;
+  min-height: 80vh;
+  border: none;
+  display: block;
+  background: white;
 }
