@@ -37,11 +37,17 @@
       color: var(--text-dark);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
     }
+    
     html, body {
-  height: 100%;
-  margin: 0;
-}
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
     /* Header */
     .coaching-header {
       background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
@@ -434,13 +440,13 @@
       }
     }
 
-
-.mock-tests-wrapper {
-  min-height: 100vh;
-  display: flex;
-  align-items: flex-start;
-  padding-bottom: 2rem;
-}
+    .mock-tests-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      padding: 0;
+      margin: 0;
+    }
 
   </style>
 </head>
@@ -452,177 +458,178 @@
   </header>
 
   <!-- Main Container -->
-   <div class="mock-tests-wrapper">
-  <div class="coaching-container">
-    <!-- Program Tabs -->
-    <div class="program-tabs">
-      <button class="tab-btn active" data-program="bstat">B.Stat</button>
-      <button class="tab-btn" data-program="mstat">M.Stat</button>
+  <div class="mock-tests-wrapper">
+    <div class="coaching-container">
+      <!-- Program Tabs -->
+      <div class="program-tabs">
+        <button class="tab-btn active" data-program="bstat">B.Stat</button>
+        <button class="tab-btn" data-program="mstat">M.Stat</button>
+      </div>
+
+      <!-- B.Stat Tests Section -->
+      <section class="tests-section active" id="bstat-section">
+        <div class="section-header">
+          <h2>B.Stat Mock Tests</h2>
+        </div>
+
+        <div class="tests-grid">
+          <!-- Test 1 - Free -->
+          <div class="test-card" data-test="bstat-1">
+            <div class="test-header">
+              <span class="test-badge">Free</span>
+              <div class="test-icon">📄</div>
+            </div>
+            <div class="test-info">
+              <h3>Mock Test 1</h3>
+              <p>Foundation level test covering basic concepts in Mathematics and Statistics</p>
+              <div class="test-meta">
+                <span>⏱️ 2 hours</span>
+                <span>📊 30 questions</span>
+                <span>🎯 Beginner</span>
+              </div>
+              <button class="test-btn">Start Test</button>
+            </div>
+          </div>
+
+          <!-- Test 2 - Free -->
+          <div class="test-card" data-test="bstat-2">
+            <div class="test-header">
+              <span class="test-badge">Free</span>
+              <div class="test-icon">📄</div>
+            </div>
+            <div class="test-info">
+              <h3>Mock Test 2</h3>
+              <p>Intermediate level test with mixed difficulty problems</p>
+              <div class="test-meta">
+                <span>⏱️ 2 hours</span>
+                <span>📊 30 questions</span>
+                <span>🎯 Intermediate</span>
+              </div>
+              <button class="test-btn">Start Test</button>
+            </div>
+          </div>
+
+          <!-- Test 3 - Locked -->
+          <div class="test-card" data-test="bstat-3">
+            <div class="test-header">
+              <span class="test-badge locked">🔒 Premium</span>
+              <div class="test-icon">📄</div>
+            </div>
+            <div class="test-info">
+              <h3>Mock Test 3</h3>
+              <p>Advanced level test simulating actual ISI exam difficulty</p>
+              <div class="test-meta">
+                <span>⏱️ 2 hours</span>
+                <span>📊 30 questions</span>
+                <span>🎯 Advanced</span>
+              </div>
+              <button class="test-btn locked">🔒 Unlock Premium</button>
+            </div>
+          </div>
+
+          <!-- Test 4 - Locked -->
+          <div class="test-card" data-test="bstat-4">
+            <div class="test-header">
+              <span class="test-badge locked">🔒 Premium</span>
+              <div class="test-icon">📄</div>
+            </div>
+            <div class="test-info">
+              <h3>Mock Test 4</h3>
+              <p>Full-length test with detailed solutions and performance analysis</p>
+              <div class="test-meta">
+                <span>⏱️ 2 hours</span>
+                <span>📊 30 questions</span>
+                <span>🎯 Advanced</span>
+              </div>
+              <button class="test-btn locked">🔒 Unlock Premium</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- M.Stat Tests Section -->
+      <section class="tests-section" id="mstat-section">
+        <div class="section-header">
+          <h2>M.Stat Mock Tests</h2>
+        </div>
+
+        <div class="tests-grid">
+          <!-- Test 1 - Free -->
+          <div class="test-card" data-test="mstat-1">
+            <div class="test-header">
+              <span class="test-badge">Free</span>
+              <div class="test-icon">📄</div>
+            </div>
+            <div class="test-info">
+              <h3>Mock Test 1</h3>
+              <p>Foundation level test covering probability and mathematical statistics</p>
+              <div class="test-meta">
+                <span>⏱️ 2 hours</span>
+                <span>📊 30 questions</span>
+                <span>🎯 Beginner</span>
+              </div>
+              <button class="test-btn">Start Test</button>
+            </div>
+          </div>
+
+          <!-- Test 2 - Free -->
+          <div class="test-card" data-test="mstat-2">
+            <div class="test-header">
+              <span class="test-badge">Free</span>
+              <div class="test-icon">📄</div>
+            </div>
+            <div class="test-info">
+              <h3>Mock Test 2</h3>
+              <p>Intermediate level test with linear algebra and real analysis</p>
+              <div class="test-meta">
+                <span>⏱️ 2 hours</span>
+                <span>📊 30 questions</span>
+                <span>🎯 Intermediate</span>
+              </div>
+              <button class="test-btn">Start Test</button>
+            </div>
+          </div>
+
+          <!-- Test 3 - Locked -->
+          <div class="test-card" data-test="mstat-3">
+            <div class="test-header">
+              <span class="test-badge locked">🔒 Premium</span>
+              <div class="test-icon">📄</div>
+            </div>
+            <div class="test-info">
+              <h3>Mock Test 3</h3>
+              <p>Advanced level test simulating actual ISI exam difficulty</p>
+              <div class="test-meta">
+                <span>⏱️ 2 hours</span>
+                <span>📊 30 questions</span>
+                <span>🎯 Advanced</span>
+              </div>
+              <button class="test-btn locked">🔒 Unlock Premium</button>
+            </div>
+          </div>
+
+          <!-- Test 4 - Locked -->
+          <div class="test-card" data-test="mstat-4">
+            <div class="test-header">
+              <span class="test-badge locked">🔒 Premium</span>
+              <div class="test-icon">📄</div>
+            </div>
+            <div class="test-info">
+              <h3>Mock Test 4</h3>
+              <p>Full-length test with comprehensive solutions and analytics</p>
+              <div class="test-meta">
+                <span>⏱️ 2 hours</span>
+                <span>📊 30 questions</span>
+                <span>🎯 Advanced</span>
+              </div>
+              <button class="test-btn locked">🔒 Unlock Premium</button>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-
-    <!-- B.Stat Tests Section -->
-    <section class="tests-section active" id="bstat-section">
-      <div class="section-header">
-        <h2>B.Stat Mock Tests</h2>
-      </div>
-
-      <div class="tests-grid">
-        <!-- Test 1 - Free -->
-        <div class="test-card" data-test="bstat-1">
-          <div class="test-header">
-            <span class="test-badge">Free</span>
-            <div class="test-icon">📄</div>
-          </div>
-          <div class="test-info">
-            <h3>Mock Test 1</h3>
-            <p>Foundation level test covering basic concepts in Mathematics and Statistics</p>
-            <div class="test-meta">
-              <span>⏱️ 2 hours</span>
-              <span>📊 30 questions</span>
-              <span>🎯 Beginner</span>
-            </div>
-            <button class="test-btn">Start Test</button>
-          </div>
-        </div>
-
-        <!-- Test 2 - Free -->
-        <div class="test-card" data-test="bstat-2">
-          <div class="test-header">
-            <span class="test-badge">Free</span>
-            <div class="test-icon">📄</div>
-          </div>
-          <div class="test-info">
-            <h3>Mock Test 2</h3>
-            <p>Intermediate level test with mixed difficulty problems</p>
-            <div class="test-meta">
-              <span>⏱️ 2 hours</span>
-              <span>📊 30 questions</span>
-              <span>🎯 Intermediate</span>
-            </div>
-            <button class="test-btn">Start Test</button>
-          </div>
-        </div>
-
-        <!-- Test 3 - Locked -->
-        <div class="test-card" data-test="bstat-3">
-          <div class="test-header">
-            <span class="test-badge locked">🔒 Premium</span>
-            <div class="test-icon">📄</div>
-          </div>
-          <div class="test-info">
-            <h3>Mock Test 3</h3>
-            <p>Advanced level test simulating actual ISI exam difficulty</p>
-            <div class="test-meta">
-              <span>⏱️ 2 hours</span>
-              <span>📊 30 questions</span>
-              <span>🎯 Advanced</span>
-            </div>
-            <button class="test-btn locked">🔒 Unlock Premium</button>
-          </div>
-        </div>
-
-        <!-- Test 4 - Locked -->
-        <div class="test-card" data-test="bstat-4">
-          <div class="test-header">
-            <span class="test-badge locked">🔒 Premium</span>
-            <div class="test-icon">📄</div>
-          </div>
-          <div class="test-info">
-            <h3>Mock Test 4</h3>
-            <p>Full-length test with detailed solutions and performance analysis</p>
-            <div class="test-meta">
-              <span>⏱️ 2 hours</span>
-              <span>📊 30 questions</span>
-              <span>🎯 Advanced</span>
-            </div>
-            <button class="test-btn locked">🔒 Unlock Premium</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- M.Stat Tests Section -->
-    <section class="tests-section" id="mstat-section">
-      <div class="section-header">
-        <h2>M.Stat Mock Tests</h2>
-      </div>
-
-      <div class="tests-grid">
-        <!-- Test 1 - Free -->
-        <div class="test-card" data-test="mstat-1">
-          <div class="test-header">
-            <span class="test-badge">Free</span>
-            <div class="test-icon">📄</div>
-          </div>
-          <div class="test-info">
-            <h3>Mock Test 1</h3>
-            <p>Foundation level test covering probability and mathematical statistics</p>
-            <div class="test-meta">
-              <span>⏱️ 2 hours</span>
-              <span>📊 30 questions</span>
-              <span>🎯 Beginner</span>
-            </div>
-            <button class="test-btn">Start Test</button>
-          </div>
-        </div>
-
-        <!-- Test 2 - Free -->
-        <div class="test-card" data-test="mstat-2">
-          <div class="test-header">
-            <span class="test-badge">Free</span>
-            <div class="test-icon">📄</div>
-          </div>
-          <div class="test-info">
-            <h3>Mock Test 2</h3>
-            <p>Intermediate level test with linear algebra and real analysis</p>
-            <div class="test-meta">
-              <span>⏱️ 2 hours</span>
-              <span>📊 30 questions</span>
-              <span>🎯 Intermediate</span>
-            </div>
-            <button class="test-btn">Start Test</button>
-          </div>
-        </div>
-
-        <!-- Test 3 - Locked -->
-        <div class="test-card" data-test="mstat-3">
-          <div class="test-header">
-            <span class="test-badge locked">🔒 Premium</span>
-            <div class="test-icon">📄</div>
-          </div>
-          <div class="test-info">
-            <h3>Mock Test 3</h3>
-            <p>Advanced level test simulating actual ISI exam difficulty</p>
-            <div class="test-meta">
-              <span>⏱️ 2 hours</span>
-              <span>📊 30 questions</span>
-              <span>🎯 Advanced</span>
-            </div>
-            <button class="test-btn locked">🔒 Unlock Premium</button>
-          </div>
-        </div>
-
-        <!-- Test 4 - Locked -->
-        <div class="test-card" data-test="mstat-4">
-          <div class="test-header">
-            <span class="test-badge locked">🔒 Premium</span>
-            <div class="test-icon">📄</div>
-          </div>
-          <div class="test-info">
-            <h3>Mock Test 4</h3>
-            <p>Full-length test with comprehensive solutions and analytics</p>
-            <div class="test-meta">
-              <span>⏱️ 2 hours</span>
-              <span>📊 30 questions</span>
-              <span>🎯 Advanced</span>
-            </div>
-            <button class="test-btn locked">🔒 Unlock Premium</button>
-          </div>
-        </div>
-      </div>
-    </section>
   </div>
-</div>
+
   <!-- Purchase Modal -->
   <div class="purchase-modal" id="purchaseModal">
     <div class="purchase-content">

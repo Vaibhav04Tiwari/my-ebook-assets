@@ -902,14 +902,8 @@ body {
   display: none;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
-/* Mock Tests Page Fix */
-.mock-tests-wrapper {
-  min-height: 100vh;
-  margin-bottom: 0;
-  padding-bottom: 2rem;
-}
-
 
 #mock-tests-section.active {
   display: block;
@@ -925,13 +919,14 @@ body {
   box-shadow: none;
   margin: 0;
 }
+
 #mock-tests-iframe {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   border: none;
   display: block;
+  overflow: hidden;
 }
-
 
 /* Responsive Design */
 @media (max-width: 900px) {
