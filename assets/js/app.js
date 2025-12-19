@@ -1,5 +1,5 @@
 // app.js - Academic Portal with Integrated Mock Tests
-// Version: 6.1 - Full Screen Mock Tests
+// Version: 6.2 - Normal Embedded iframe
 
 // ==================== CONFIGURATION ====================
 class Config {
@@ -85,20 +85,13 @@ class NavigationManager {
       }
     });
     
-    // Get header and footer elements
+    // Keep header and footer visible for all sections
     const header = document.getElementById('site-header');
     const footer = document.getElementById('site-footer');
     
-    // Hide header and footer for full-screen mock tests
-    if (sectionName === 'mock-tests') {
-      if (header) header.style.display = 'none';
-      if (footer) footer.style.display = 'none';
-      document.body.style.overflow = 'hidden'; // Prevent body scroll
-    } else {
-      if (header) header.style.display = 'block';
-      if (footer) footer.style.display = 'block';
-      document.body.style.overflow = 'auto'; // Restore body scroll
-    }
+    if (header) header.style.display = 'block';
+    if (footer) footer.style.display = 'block';
+    document.body.style.overflow = 'auto';
     
     // Handle hero section visibility
     if (this.heroSection) {
