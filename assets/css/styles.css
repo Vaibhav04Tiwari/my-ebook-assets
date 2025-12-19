@@ -903,6 +903,13 @@ body {
   margin: 0;
   padding: 0;
 }
+/* Mock Tests Page Fix */
+.mock-tests-wrapper {
+  min-height: 100vh;
+  margin-bottom: 0;
+  padding-bottom: 2rem;
+}
+
 
 #mock-tests-section.active {
   display: block;
