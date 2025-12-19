@@ -479,10 +479,6 @@ class Header {
     if (header) {
       header.innerHTML = `
         <div class="header-content">
-          <a href="#home" class="logo" data-section="home">
-            <span class="logo-icon">📚</span>
-            <span class="logo-text">Academic Portal</span>
-          </a>
           <nav class="main-nav">
             <a href="#home" class="nav-link active" data-section="home">Home</a>
             <a href="#author" class="nav-link" data-section="author">Author</a>
@@ -631,18 +627,7 @@ class AcademicPortalApp {
         coachingBtn.addEventListener('click', () => this.navigateToMockTests());
       }
       
-      const logo = document.querySelector('.logo');
-      if (logo) {
-        logo.addEventListener('click', (e) => {
-          e.preventDefault();
-          this.navigationManager.showSection('home');
-          const navLinks = document.querySelectorAll('.nav-link');
-          navLinks.forEach(link => {
-            link.classList.toggle('active', link.getAttribute('data-section') === 'home');
-          });
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      }
+      
       
     }, 300);
   }
