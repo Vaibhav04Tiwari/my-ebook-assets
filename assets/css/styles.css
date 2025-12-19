@@ -421,11 +421,18 @@ body {
 .footer-content {
   max-width: 1200px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
   padding-bottom: 2rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-section {
+  display: flex;
+  align-items: center;
 }
 
 .footer-section h4 {
@@ -442,6 +449,7 @@ body {
   line-height: 1.6;
   text-decoration: none;
   transition: color 0.2s ease;
+  margin: 0;
 }
 
 .footer-section a:hover {
@@ -879,6 +887,46 @@ body {
   box-shadow: 0 4px 15px rgba(134, 176, 151, 0.25);
 }
 
+/* ========================================
+   MOCK TESTS SECTION - FULL SCREEN
+   ======================================== */
+
+#mock-tests-section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: white;
+  display: none;
+  margin: 0;
+  padding: 0;
+}
+
+#mock-tests-section.active {
+  display: block;
+}
+
+#mock-tests-section .section-card {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 0;
+  height: 100vh;
+  width: 100vw;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+}
+
+#mock-tests-iframe {
+  width: 100%;
+  height: 100vh;
+  border: none;
+  display: block;
+  background: white;
+}
+
 /* Responsive Design */
 @media (max-width: 900px) {
   .card-main {
@@ -902,6 +950,17 @@ body {
 }
 
 @media (max-width: 768px) {
+  /* Footer Mobile */
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .footer-section {
+    justify-content: center;
+  }
+
   /* PDF Viewer Mobile */
   .pdf-viewer-header {
     padding: 0.8rem 1rem;
@@ -986,10 +1045,6 @@ body {
     left: 10px;
   }
 
-  .footer-content {
-    grid-template-columns: 1fr;
-  }
-
   .auth-modal-content {
     width: 95%;
     padding: 40px 25px;
@@ -1038,56 +1093,4 @@ body {
     height: 36px;
     font-size: 1.6rem;
   }
-}
-/* Enhanced Footer Styles - Add this to your existing styles.css */
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1.5rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.footer-section {
-  display: flex;
-  align-items: center;
-}
-
-.footer-section p {
-  margin: 0;
-}
-
-.footer-section a:hover {
-  color: #c1e5d0 !important;
-  text-decoration: underline;
-}
-
-/* Mobile responsive footer */
-@media (max-width: 768px) {
-  .footer-content {
-    flex-direction: column;
-    text-align: center;
-    gap: 1rem;
-  }
-  
-  .footer-section {
-    justify-content: center;
-  }
-}#mock-tests-section .section-card {
-  padding: 0;
-  overflow: hidden;
-  border-radius: 8px;
-}
-
-#mock-tests-iframe {
-  width: 100%;
-  min-height: 80vh;
-  border: none;
-  display: block;
-  background: white;
 }
